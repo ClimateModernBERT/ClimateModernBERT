@@ -1,0 +1,186 @@
+{
+  "tasks": {
+    "wximpactbench": {
+      "type": "multilabel",
+      "dataset_name": "Michaelyya/wximpactbench-1386",
+      "text_column": "text",
+      "impact_columns": [
+        "infrastructural_impact",
+        "political_impact",
+        "financial_impact",
+        "ecological_impact",
+        "agricultural_impact",
+        "human_health_impact"
+      ]
+    },
+    "water_forest_biodiversity_nature": {
+      "type": "multilabel",
+      "dataset_name": "ESGBERT/WaterForestBiodiversityNature_2200",
+      "text_column": "text",
+      "impact_columns": [
+        "Water",
+        "Forest", 
+        "Biodiversity",
+        "Nature"
+      ]
+    },
+    "climate_bug": {
+      "type": "binary_numeric",
+      "dataset_name": "lumilogic/climateBUG-Data",
+      "text_column": "text",
+      "label_column": "label"
+    },
+    "climate_detection": {
+      "type": "binary_numeric",
+      "dataset_name": "climatebert/climate_detection",
+      "text_column": "text",
+      "label_column": "label"
+    },
+    "netzero_reduction": {
+      "type": "multiclass",
+      "dataset_name": "climatebert/netzero_reduction_data",
+      "text_column": "text",
+      "label_column": "target",
+      "num_classes": 3,
+      "class_names": ["none", "net-zero", "reduction"]
+    },
+    "environmental_claims": {
+      "type": "binary_numeric",
+      "dataset_name": "climatebert/environmental_claims",
+      "text_column": "text",
+      "label_column": "label"
+    },
+    "tcfd_recommendations": {
+      "type": "multiclass",
+      "dataset_name": "climatebert/tcfd_recommendations",
+      "text_column": "text",
+      "label_column": "label",
+      "num_classes": 5,
+      "class_names": ["none", "metrics", "strategy", "risk", "governance"]
+    },
+    "climate_sentiment": {
+      "type": "multiclass",
+      "dataset_name": "climatebert/climate_sentiment",
+      "text_column": "text",
+      "label_column": "label",
+      "num_classes": 3,
+      "class_names": ["risk", "neutral", "opportunity"]
+    },
+    "climate_commitments_actions": {
+      "type": "binary_numeric",
+      "dataset_name": "climatebert/climate_commitments_actions",
+      "text_column": "text",
+      "label_column": "label"
+    },
+    "climate_specificity": {
+      "type": "binary_numeric",
+      "dataset_name": "climatebert/climate_specificity",
+      "text_column": "text",
+      "label_column": "label"
+    },
+    "cola": {
+      "type": "glue_classification",
+      "dataset_name": "glue",
+      "dataset_config": "cola",
+      "text_column": "sentence",
+      "label_column": "label",
+      "num_classes": 2,
+      "class_names": ["unacceptable", "acceptable"]
+    },
+    "sst2": {
+      "type": "glue_classification",
+      "dataset_name": "glue",
+      "dataset_config": "sst2",
+      "text_column": "sentence",
+      "label_column": "label",
+      "num_classes": 2,
+      "class_names": ["negative", "positive"]
+    },
+    "mrpc": {
+      "type": "glue_paraphrase",
+      "dataset_name": "glue",
+      "dataset_config": "mrpc",
+      "text_column": "sentence1",
+      "text_column2": "sentence2",
+      "label_column": "label",
+      "num_classes": 2,
+      "class_names": ["not_equivalent", "equivalent"]
+    },
+    "stsb": {
+      "type": "glue_regression",
+      "dataset_name": "glue",
+      "dataset_config": "stsb",
+      "text_column": "sentence1",
+      "text_column2": "sentence2",
+      "label_column": "label"
+    },
+    "qqp": {
+      "type": "glue_paraphrase",
+      "dataset_name": "glue",
+      "dataset_config": "qqp",
+      "text_column": "question1",
+      "text_column2": "question2",
+      "label_column": "label",
+      "num_classes": 2,
+      "class_names": ["not_duplicate", "duplicate"]
+    },
+    "mnli": {
+      "type": "glue_nli",
+      "dataset_name": "glue",
+      "dataset_config": "mnli",
+      "text_column": "premise",
+      "text_column2": "hypothesis",
+      "label_column": "label",
+      "num_classes": 3,
+      "class_names": ["entailment", "neutral", "contradiction"]
+    },
+    "qnli": {
+      "type": "glue_nli",
+      "dataset_name": "glue",
+      "dataset_config": "qnli",
+      "text_column": "question",
+      "text_column2": "sentence",
+      "label_column": "label",
+      "num_classes": 2,
+      "class_names": ["not_entailment", "entailment"]
+    },
+    "rte": {
+      "type": "glue_nli",
+      "dataset_name": "glue",
+      "dataset_config": "rte",
+      "text_column": "sentence1",
+      "text_column2": "sentence2",
+      "label_column": "label",
+      "num_classes": 2,
+      "class_names": ["not_entailment", "entailment"]
+    },
+    "wnli": {
+      "type": "glue_nli",
+      "dataset_name": "glue",
+      "dataset_config": "wnli",
+      "text_column": "sentence1",
+      "text_column2": "sentence2",
+      "label_column": "label",
+      "num_classes": 2,
+      "class_names": ["not_entailment", "entailment"]
+    }
+  },
+
+  "defaults": {
+    "base_model_path": "/cluster/scratch/yongyu/ClimateModernBERT/climate-modernbert-pretrained-full/finetuned_model-300",
+    "base_save_dir": "/cluster/scratch/yongyu/ClimateModernBERT/finetuned_model-300",
+    "benchmark_output_dir": "/cluster/scratch/yongyu/ClimateModernBERT/ClimateBERT-benchmark-results/finetuned_model-300",
+    "training": {
+      "learning_rate": 4e-5,
+      "num_train_epochs": 10,
+      "per_device_train_batch_size": 32,
+      "per_device_eval_batch_size": 16,
+      "weight_decay": 0.01,
+      "gradient_accumulation_steps": 2,
+      "max_length": 512
+    }
+  }
+}
+
+
+

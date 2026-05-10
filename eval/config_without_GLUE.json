@@ -71,23 +71,13 @@
       "dataset_name": "climatebert/climate_specificity",
       "text_column": "text",
       "label_column": "label"
-    },
-    "clim_retrieve": {
-      "type": "retrieval_binary_classification",
-      "local_data_path": "/cluster/project/sachan/ClimateModernBERT/finetuning/ClimRetrieve/Report-Level Dataset/ClimRetrieve_ReportLevel_V1.csv",
-      "query_column": "question",
-      "text_column": "paragraph",
-      "label_column": "relevance",
-      "relevance_threshold": 1,
-      "num_classes": 2,
-      "class_names": ["not_answerable", "answerable"]
     }
   },
 
   "defaults": {
-    "base_model_path": "sraj/Merge_CMB_MARK_CX_LRD_CMB_FWEdu_V2_CX_LRD_CMB_WX_SYN_CX_LRD",
-    "base_save_dir": "/cluster/scratch/yongyu/ClimateModernBERT/finetuned_Merge_CMB_MARK_CX_LRD_CMB_FWEdu_V2_CX_LRD_CMB_WX_SYN_CX_LRD",
-    "benchmark_output_dir": "/cluster/scratch/yongyu/ClimateModernBERT/ClimateBERT-benchmark-results/finetuned_Merge_CMB_MARK_CX_LRD_CMB_FWEdu_V2_CX_LRD_CMB_WX_SYN_CX_LRD",
+    "base_model_path": "sraj/CMB_MICH_FWEdu_DEDUP_CX",
+    "base_save_dir": "/cluster/scratch/yongyu/ClimateModernBERT/finetuned_CMB_MICH_FWEdu_DEDUP_CX",
+    "benchmark_output_dir": "/cluster/scratch/yongyu/ClimateModernBERT/ClimateBERT-benchmark-results/finetuned_CMB_MICH_FWEdu_DEDUP_CX",
     "training": {
       "learning_rate": 4e-5,
       "num_train_epochs": 10,

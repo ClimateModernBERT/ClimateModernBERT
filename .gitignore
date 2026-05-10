@@ -1,0 +1,45 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+.python-version
+
+# IDEs / editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Project: data, checkpoints, generated outputs (not for the public repo).
+# Anchored to repo root so they don't catch folders like src/data/.
+/seed/
+/synthetic data/
+/data/
+/checkpoints/
+/runs/
+/wandb/
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.parquet
+*.mds
+
+# Project: paper drafts (kept private)
+/Writing/
+
+# Logs
+*.log
+*.out

@@ -32,19 +32,19 @@ def prepare_multilabel_dataset(dataset, impact_columns):
                 labels.append(0.0)
         example['labels'] = labels
         return example
-    
+
     return dataset.map(convert_to_multilabel)
 
 
 
 def prepare_multiclass_dataset(dataset, label_column, num_classes, class_names):
-    
+
     label_to_id = {name: i for i, name in enumerate(class_names)}
-    
+
     def convert_to_multiclass(example):
         if label_column in example:
             label = example[label_column]
-            
+
             if isinstance(label, (int, float)):
                 if 0 <= label < num_classes:
                     example['labels'] = int(label)
@@ -60,7 +60,7 @@ def prepare_multiclass_dataset(dataset, label_column, num_classes, class_names):
         else:
             example['labels'] = 0
         return example
-    
+
     return dataset.map(convert_to_multiclass)
 
 def prepare_binary_numeric_dataset(dataset, label_column):
@@ -77,13 +77,13 @@ def prepare_binary_numeric_dataset(dataset, label_column):
         else:
             example['labels'] = 0
         return example
-    
+
     return dataset.map(convert_to_binary_numeric)
 
 def prepare_glue_classification_dataset(dataset, text_column, label_column, num_classes, class_names):
     """Prepare GLUE classification tasks (CoLA, SST-2)"""
     label_to_id = {name: i for i, name in enumerate(class_names)}
-    
+
     def convert_to_glue_classification(example):
         if label_column in example:
             label = example[label_column]
@@ -102,12 +102,12 @@ def prepare_glue_classification_dataset(dataset, text_column, label_column, num_
         else:
             example['labels'] = 0
         return example
-    
+
     return dataset.map(convert_to_glue_classification)
 
 def prepare_glue_paraphrase_dataset(dataset, text_column, text_column2, label_column, num_classes, class_names):
     label_to_id = {name: i for i, name in enumerate(class_names)}
-    
+
     def convert_to_glue_paraphrase(example):
         if label_column in example:
             label = example[label_column]
@@ -126,12 +126,12 @@ def prepare_glue_paraphrase_dataset(dataset, text_column, text_column2, label_co
         else:
             example['labels'] = 0
         return example
-    
+
     return dataset.map(convert_to_glue_paraphrase)
 
 def prepare_glue_nli_dataset(dataset, text_column, text_column2, label_column, num_classes, class_names):
     label_to_id = {name: i for i, name in enumerate(class_names)}
-    
+
     def convert_to_glue_nli(example):
         if label_column in example:
             label = example[label_column]
@@ -150,7 +150,7 @@ def prepare_glue_nli_dataset(dataset, text_column, text_column2, label_column, n
         else:
             example['labels'] = 0
         return example
-    
+
     return dataset.map(convert_to_glue_nli)
 
 def prepare_glue_regression_dataset(dataset, text_column, text_column2, label_column):
@@ -164,7 +164,7 @@ def prepare_glue_regression_dataset(dataset, text_column, text_column2, label_co
         else:
             example['labels'] = 0.0
         return example
-    
+
     return dataset.map(convert_to_glue_regression)
 
 def prepare_beir_retrieval_dataset(dataset, text_column, query_column, corpus_column):
@@ -256,111 +256,93 @@ def split_dataset_if_needed(dataset, task_name, task_config, config):
     })
 
 def train_single_task(args, task_name, task_config, config, cache_dir=None, temp_dir=None):
-    
+
     base_save_dir = config['defaults']['base_save_dir']
     base_model_path = config['defaults']['base_model_path']
-    
+
     task_save_dir = os.path.join(base_save_dir, task_name)
-    
+
     if os.path.exists(task_save_dir) and os.path.exists(os.path.join(task_save_dir, "pytorch_model.bin")):
         return task_save_dir
-    
+
     # Ensure temp directory is set for datasets processing
     if temp_dir:
         os.environ['TMPDIR'] = temp_dir
         os.environ['TMP'] = temp_dir
         os.environ['TEMP'] = temp_dir
-    
+
     tokenizer = AutoTokenizer.from_pretrained(base_model_path, cache_dir=cache_dir)
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-    
+
     if task_config['type'] == 'multilabel':
         dataset = load_dataset(task_config['dataset_name'], cache_dir=cache_dir)
         dataset = split_dataset_if_needed(dataset, task_name, task_config, config)
-        
+
         dataset = prepare_multilabel_dataset(dataset, task_config['impact_columns'])
 
         def tokenize_function(example):
             return tokenizer(example[task_config['text_column']], truncation=True, max_length=config['defaults']['training']['max_length'])
-    
-        tokenized_dataset = dataset.map(tokenize_function, batched=True, 
+
+        tokenized_dataset = dataset.map(tokenize_function, batched=True,
                                        remove_columns=[task_config['text_column']] + task_config['impact_columns'])
-        
+
         num_labels = len(task_config['impact_columns'])
         problem_type = "multi_label_classification"
-        
+
     elif task_config['type'] == 'multiclass':
         dataset = load_dataset(task_config['dataset_name'], cache_dir=cache_dir)
-        
+
         dataset = split_dataset_if_needed(dataset, task_name, task_config, config)
-        
+
         dataset = prepare_multiclass_dataset(dataset, task_config['label_column'], task_config['num_classes'], task_config['class_names'])
-        
+
         def tokenize_function(example):
             return tokenizer(example[task_config['text_column']], truncation=True, max_length=config['defaults']['training']['max_length'])
-        
-        tokenized_dataset = dataset.map(tokenize_function, batched=True, 
+
+        tokenized_dataset = dataset.map(tokenize_function, batched=True,
                                        remove_columns=[task_config['text_column'], task_config['label_column']])
-        
+
         num_labels = task_config['num_classes']
         problem_type = "single_label_classification"
-        
-    #     # Debug: Check labels for multiclass
-    #     if 'train' in tokenized_dataset:
-    #         sample_labels = tokenized_dataset['train']['labels'][:5]
-    #         unique_labels = set(tokenized_dataset['train']['labels'])
-    #         print(f"🔍 Multiclass labels - Sample: {sample_labels}, Unique: {unique_labels}")
-        
-    # elif task_config['type'] == 'binary':
-    #     # Load HuggingFace dataset for binary classification
-    #     dataset = load_dataset(task_config['dataset_name'])        
-    #     def tokenize_function(example):
-    #         return tokenizer(example[task_config['text_column']], truncation=True, max_length=config['defaults']['training']['max_length'])
-        
-    #     tokenized_dataset = dataset.map(tokenize_function, batched=True, 
-    #                                    remove_columns=[task_config['text_column'], 'label'])
-        
-    #     num_labels = 2  # Binary classification: 0 and 1
-    #     problem_type = "single_label_classification"
-        
+
     elif task_config['type'] == 'binary_numeric':
         dataset = load_dataset(task_config['dataset_name'], cache_dir=cache_dir)
-        
+
         dataset = split_dataset_if_needed(dataset, task_name, task_config, config)
-        
+
         dataset = prepare_binary_numeric_dataset(dataset, task_config['label_column'])
-        
+
         def tokenize_function(example):
             return tokenizer(example[task_config['text_column']], truncation=True, max_length=config['defaults']['training']['max_length'])
-        
-        tokenized_dataset = dataset.map(tokenize_function, batched=True, 
+
+        tokenized_dataset = dataset.map(tokenize_function, batched=True,
                                        remove_columns=[task_config['text_column'], task_config['label_column']])
-        
+
         num_labels = 2
         problem_type = "single_label_classification"
-        
+
     elif task_config['type'] == 'glue_classification':
         dataset = load_dataset(task_config['dataset_name'], task_config['dataset_config'], cache_dir=cache_dir)
-        
+
         dataset = split_dataset_if_needed(dataset, task_name, task_config, config)
-        
-        dataset = prepare_glue_classification_dataset(dataset, task_config['text_column'], task_config['label_column'], 
+
+        dataset = prepare_glue_classification_dataset(dataset, task_config['text_column'], task_config['label_column'],
                                                     task_config['num_classes'], task_config['class_names'])
-        
+
         def tokenize_function(example):
             return tokenizer(example[task_config['text_column']], truncation=True, max_length=config['defaults']['training']['max_length'])
-        
-        tokenized_dataset = dataset.map(tokenize_function, batched=True, 
+
+        tokenized_dataset = dataset.map(tokenize_function, batched=True,
                                        remove_columns=[task_config['text_column'], task_config['label_column']])
-        
+
         num_labels = task_config['num_classes']
         problem_type = "single_label_classification"
-        
+
     elif task_config['type'] == 'glue_paraphrase':
         dataset = load_dataset(task_config['dataset_name'], task_config['dataset_config'], cache_dir=cache_dir)
-        
+
         dataset = split_dataset_if_needed(dataset, task_name, task_config, config)
-        
+
         dataset = prepare_glue_paraphrase_dataset(dataset, task_config['text_column'], task_config['text_column2'],
                                                 task_config['label_column'], task_config['num_classes'], task_config['class_names'])
 
@@ -373,15 +355,15 @@ def train_single_task(args, task_name, task_config, config, cache_dir=None, temp
 
         tokenized_dataset = dataset.map(tokenize_function, batched=True,
                                        remove_columns=[task_config['text_column'], task_config['text_column2'], task_config['label_column']])
-        
+
         num_labels = task_config['num_classes']
         problem_type = "single_label_classification"
-        
+
     elif task_config['type'] == 'glue_nli':
         dataset = load_dataset(task_config['dataset_name'], task_config['dataset_config'], cache_dir=cache_dir)
-        
+
         dataset = split_dataset_if_needed(dataset, task_name, task_config, config)
-        
+
         dataset = prepare_glue_nli_dataset(dataset, task_config['text_column'], task_config['text_column2'],
                                          task_config['label_column'], task_config['num_classes'], task_config['class_names'])
 
@@ -394,16 +376,16 @@ def train_single_task(args, task_name, task_config, config, cache_dir=None, temp
 
         tokenized_dataset = dataset.map(tokenize_function, batched=True,
                                        remove_columns=[task_config['text_column'], task_config['text_column2'], task_config['label_column']])
-        
+
         num_labels = task_config['num_classes']
         problem_type = "single_label_classification"
-        
+
     elif task_config['type'] == 'glue_regression':
         dataset = load_dataset(task_config['dataset_name'], task_config['dataset_config'], cache_dir=cache_dir)
-        
+
         # Split dataset if test split doesn't exist
         dataset = split_dataset_if_needed(dataset, task_name, task_config, config)
-        
+
         dataset = prepare_glue_regression_dataset(dataset, task_config['text_column'], task_config['text_column2'],
                                                 task_config['label_column'])
 
@@ -416,7 +398,7 @@ def train_single_task(args, task_name, task_config, config, cache_dir=None, temp
 
         tokenized_dataset = dataset.map(tokenize_function, batched=True,
                                        remove_columns=[task_config['text_column'], task_config['text_column2'], task_config['label_column']])
-        
+
         num_labels = 1
         problem_type = "regression"
 
@@ -448,13 +430,13 @@ def train_single_task(args, task_name, task_config, config, cache_dir=None, temp
 
 
     model = AutoModelForSequenceClassification.from_pretrained(
-        base_model_path, 
+        base_model_path,
         num_labels=num_labels,
         problem_type=problem_type,
         ignore_mismatched_sizes=True,
         cache_dir=cache_dir
     )
-    
+
     eval_dataset = tokenized_dataset.get('validation') or tokenized_dataset.get('test')
 
     training_args = TrainingArguments(
@@ -486,28 +468,29 @@ def train_single_task(args, task_name, task_config, config, cache_dir=None, temp
         data_collator=data_collator,
         compute_metrics=compute_metrics,
     )
-    
+
     trainer.train()
     trainer.save_model(task_save_dir)
     trainer.save_state()
     tokenizer.save_pretrained(task_save_dir)
-    
+
     return task_save_dir
 
 def main():
-    parser = argparse.ArgumentParser(description="Multi-task fine-tuning script for ModernBERT")
-    parser.add_argument("--config_file", type=str, 
+    parser = argparse.ArgumentParser(description="Multi-task fine-tuning script for ModernBERT (10 seeds)")
+    parser.add_argument("--config_file", type=str,
                        default="config.json",
                        help="Path to configuration JSON file")
     parser.add_argument("--base_model_path", type=str, default=None,
                        help="Path to base ModernBERT checkpoint (overrides config)")
     parser.add_argument("--base_save_dir", type=str, default=None,
                        help="Base directory to save all task checkpoints (overrides config)")
-    parser.add_argument("--seeds", type=int, nargs='+', default=[42, 123, 456],
-                       help="List of random seeds for multi-seed training (default: 42 123 456)")
+    parser.add_argument("--seeds", type=int, nargs='+',
+                       default=[42, 123, 456, 789, 1024, 2025, 7, 31, 999, 1337],
+                       help="List of 10 random seeds for multi-seed training (default: 10 seeds)")
     parser.add_argument("--gcs", type=int, default=None)
     args = parser.parse_args()
-    
+
     logging.set_verbosity_info()
     torch._dynamo.disable()
 
@@ -552,11 +535,16 @@ def main():
     if '/scratch/' in original_base_save_dir:
         print(f"📁 Using temporary directory for datasets: {os.environ.get('TMPDIR', 'default')}")
 
+    if len(args.seeds) != 10:
+        print(f"⚠️  Warning: expected 10 seeds, got {len(args.seeds)}. Proceeding with provided seeds.")
+
+    print(f"🌱 Running multi-seed fine-tuning with {len(args.seeds)} seeds: {args.seeds}")
+
     # Multi-seed training loop
     all_seed_checkpoints = {}
-    for seed in args.seeds:
+    for seed_idx, seed in enumerate(args.seeds, start=1):
         print(f"\n{'='*60}")
-        print(f"🌱 TRAINING WITH SEED {seed}")
+        print(f"🌱 TRAINING WITH SEED {seed} ({seed_idx}/{len(args.seeds)})")
         print(f"{'='*60}")
 
         set_seed(seed)
@@ -582,19 +570,33 @@ def main():
             f.write(f"Multi-task Fine-tuning Summary (seed={seed})\n")
             f.write("=" * 40 + "\n")
             f.write(f"Base model: {base_model_path}\n")
-            f.write(f"Seed: {seed}\n")
+            f.write(f"Seed: {seed} ({seed_idx}/{len(args.seeds)})\n")
             f.write(f"Total tasks processed: {len(saved_checkpoints)}\n\n")
             for task_name, checkpoint_path in saved_checkpoints.items():
                 f.write(f"{task_name}: {checkpoint_path}\n")
 
         print(f"\n✅ Seed {seed} completed! Checkpoints saved to: {seed_save_dir}")
 
-    print(f"\n🎉 Multi-seed fine-tuning completed!")
+    # Aggregate summary across all 10 seeds
+    aggregate_summary = os.path.join(os.path.dirname(original_base_save_dir) or ".",
+                                     f"{os.path.basename(original_base_save_dir)}_10seeds_summary.txt")
+    with open(aggregate_summary, 'w') as f:
+        f.write("Multi-task Fine-tuning Summary (10 seeds)\n")
+        f.write("=" * 40 + "\n")
+        f.write(f"Base model: {base_model_path}\n")
+        f.write(f"Seeds: {args.seeds}\n\n")
+        for seed, checkpoints in all_seed_checkpoints.items():
+            f.write(f"\nSeed {seed}:\n")
+            for task_name, checkpoint_path in checkpoints.items():
+                f.write(f"  {task_name}: {checkpoint_path}\n")
+
+    print(f"\n🎉 Multi-seed (10-seed) fine-tuning completed!")
     print(f"Seeds trained: {args.seeds}")
+    print(f"Aggregate summary: {aggregate_summary}")
     for seed, checkpoints in all_seed_checkpoints.items():
         print(f"\n  Seed {seed}:")
         for task_name, checkpoint_path in checkpoints.items():
             print(f"    {task_name}: {checkpoint_path}")
 
 if __name__ == '__main__':
-    main() 
+    main()

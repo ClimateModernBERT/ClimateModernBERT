@@ -2,7 +2,7 @@
 
 
 source .venv/bin/activate
-# uv pip install mergekit immutables
+uv pip install mergekit immutables
 # ==============================================================================
 #  FILL THESE IN
 # ==============================================================================

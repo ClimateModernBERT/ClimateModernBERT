@@ -1,0 +1,16 @@
+models:
+  - model: A
+    parameters:
+      weight: 1.0
+  - model: F
+    parameters:
+      weight: 1.0
+  - model: S
+    parameters:
+      weight: 1.0
+merge_method: task_arithmetic
+base_model: B
+parameters:
+  normalize: true
+  lambda: 1.0
+dtype: bfloat16

@@ -1,0 +1,18 @@
+models:
+  - model: A
+    parameters:
+      density: 0.7
+      weight: 0.33
+  - model: F
+    parameters:
+      density: 0.7
+      weight: 0.33
+  - model: S
+    parameters:
+      density: 0.7
+      weight: 0.33
+merge_method: dare_ties
+base_model: B
+parameters:
+  int8_mask: true
+dtype: bfloat16

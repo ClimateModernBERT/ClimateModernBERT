@@ -1,0 +1,11 @@
+models:
+  - model: F
+    parameters:
+      weight: 1.0
+  - model: S
+    parameters:
+      weight: 1.0
+merge_method: linear
+parameters:
+  normalize: true
+dtype: bfloat16

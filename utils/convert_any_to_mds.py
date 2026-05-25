@@ -180,64 +180,40 @@ def convert_to_mds(
 # Example usage
 if __name__ == '__main__':
     sources = [
-        # WXIMPACT BENCH 
-        {
-            'type': 'jsonl',
-            'path': '/home/sraj/data/mbert/nemo_curator/wximpactbench_1_nemo/final_pretrain_data.jsonl',
-            'text_key': 'text'
-        },
-        # SYNTHETIC ONLY
+        # SYNTHETIC 
         {
             'type': 'jsonl', 
-            'path': '/home/sraj/data/mbert/nemo_curator/synthetic_data_1_nemo/final_pretrain_data.jsonl',
+            'path': '/home/xxx/data/mbert/nemo_curator/synthetic/final_pretrain_data.jsonl',
             'text_key': 'text'
         },
-        # # MARKUS
-        # {
-        #     'type': 'jsonl', 
-        #     'path': '/home/sraj/data/mbert/nemo_curator/markus_1_nemo/final_pretrain_data.jsonl',
-        #     'text_key': 'text'
-        # },
-        # # Local CSV
-        # {
-        #     'type': 'csv',
-        #     'path': '/data/corpus3.csv',
-        #     'text_key': 'document'
-        # },
-        # # Local TSV
-        # {
-        #     'type': 'tsv',
-        #     'path': '/data/corpus4.tsv',
-        #     'text_key': 'text'
-        # },
-        # Plain text file (split by double newlines)
-        # {
-        #     'type': 'txt',
-        #     'path': '/home/kai/work/ModernBERT/data/sample.txt',
-        #     'doc_separator': '\n'
-        # },
+        # ACADEMIC
+        {
+            'type': 'jsonl', 
+            'path': '/home/xxx/data/mbert/nemo_curator/academic/final_pretrain_data.jsonl',
+            'text_key': 'text'
+        },
         # # HuggingFace dataset
         {
             'type': 'huggingface',
-            'dataset': 'sraj/zyda_arxiv-climate-v1',
+            'dataset': 'xxx/yyy',
             'split': 'train',
             'text_key': 'text',
             'streaming': True  # Stream to avoid downloading all at once
         },
-        # # Another HuggingFace dataset
-        # {
-        #     'type': 'huggingface',
-        #     'dataset': 'sraj/finewebedu-climate-v2',
-        #     # 'subset': '20220301.en',
-        #     'split': 'train',
-        #     'text_key': 'text',
-        #     'streaming': True
-        # },
+        # Another HuggingFace dataset
+        {
+            'type': 'huggingface',
+            'dataset': 'xxx/yyy',
+            # 'subset': '20220301.en',
+            'split': 'train',
+            'text_key': 'text',
+            'streaming': True
+        },
     ]
     
     convert_to_mds(
         sources=sources,
-        output_dir='/home/sraj/scratch/wximpactbench_synthetic_zyda',
+        output_dir='/home/xxx/scratch/xxx',
         compression=None,
         size_limit=64 * 1024 * 1024  # 64MB shards
     )

@@ -7,15 +7,13 @@
 #SBATCH -e logs/%j.err
 
 module load dev2025a 
-source ~/hpc_notify.sh
 
-export HF_HOME="/scratch/sraj/"
-export TRITON_CACHE_DIR="/scratch/sraj/tritoncache"
-export TRITON_HOME="/scratch/sraj/tritoncache"
-export VLLM_CACHE_ROOT="/scratch/sraj/vllmcache"
+export HF_HOME="/scratch/xxx/"
+export TRITON_CACHE_DIR="/scratch/xxx/tritoncache"
+export TRITON_HOME="/scratch/xxx/tritoncache"
+export VLLM_CACHE_ROOT="/scratch/xxx/vllmcache"
 
 source .venv/bin/activate
-hpc_notify "🚀 Started: Model Upload"
 
 # SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_SCRIPT="./upload_to_hub.py"
@@ -35,67 +33,20 @@ if [[ -z "${HF_TOKEN}" ]]; then
 fi
 export HF_TOKEN
 
-BASE_PATH="/home/sraj/scratch"
-HF_NAMESPACE="sraj"
+BASE_PATH="/home/xxx/scratch"
+HF_NAMESPACE="xxx"
 MAKE_PRIVATE="false"
 DELETE_EXISTING="false"
 
-# MODELS=(
-# 	"MB_CPT_ZYDA_ARXIV_FB_5Btok:MB_CPT_ZYDA_ARXIV_ALL_FB_5Btok"
-#     "MB_CPT_ZYDA_ARXIV_2Btok:MB_CPT_ZYDA_ARXIV_2Btok"
-#     "MB_CPT_FWEDU_1Btok:MB_CPT_FWEDU_1Btok"
-# 	"MB_CPT_FWEB_10Btok:MB_CPT_FWEDU_10Btok"
-# )
-# MODELS=(
-# 	"MB_CPT_FWEB_10Btok:MB_CPT_FWEDU_10Btok"
-# 	"MB_CPT_ARXIV_LR_DEC_FWEB_5Btok:MB_CPT_ARXIV_LR_DEC_FWEB_5Btok"
-# )
-# MODELS=(
-# 	"MB_PT_FWEB_5Btok:MB_PT_FWEB_5Btok"
-# 	"MB_CX2K_FWEB_10Btok:MB_CX2K_FWEB_10Btok"
-# )
-# MODELS=(
-# 	"MB_CX8K_CLIM_P_3EP:MB_CX8K_CLIM_P_3EP"
-# )
-# MODELS=(
-# 	"MB_CX8K_CLIM_P_5Btok:MB_CX8K_CLIM_P_5Btok"
-# 	"MB_CX8K_CLIM_P_1EP:MB_CX8K_CLIM_P_1EP"
-# )
-# MODELS=(
-# 	"MB_CX8K_CLIM_P_NC_1EP:MB_CX8K_CLIM_P_NCv1_1EP"
-# 	"MB_CX8K_CLIM_P_NC_2EP:MB_CX8K_CLIM_P_NCv1_2EP"
-# 	"MB_CX8K_CLIM_P_NC_3EP:MB_CX8K_CLIM_P_NCv1_3EP"
-# )
-
-# MODELS=(
-# 	"CMB_MICH_FWEdu_DEDUP_CX:CMB_MICH_FWEdu_DEDUP_CX"
-# 	"CMB_MICH_FWEdu_DEDUP_CX_LRD:CMB_MICH_FWEdu_DEDUP_CX_LRD"
-# )
-
-# MODELS=(
-# 	"CMB_MICH_FWEdu_CX:CMB_MICH_FWEdu_CX"
-# )
-# "CMB_MARK_WX_SYN_CX:CMB_MARK_WX_SYN_CX"
-# MODELS=(
-# 	"CMB_MARK_CX:CMB_MARK_CX"
-# 	"CMB_FWEdu_V2_CX:CMB_FWEdu_V2_CX"
-# 	"CMB_WX_SYN_CX:CMB_WX_SYN_CX"
-# )
 MODELS=(
-	"CMB_MARK_CX_LRD:CMB_MARK_CX_LRD"
-	"CMB_MARK_WX_SYN_CX_LRD:CMB_MARK_WX_SYN_CX_LRD"
-	"CMB_FWEdu_V2_CX_LRD:CMB_FWEdu_V2_CX_LRD"
-	"CMB_WX_SYN_CX_LRD:CMB_WX_SYN_CX_LRD"
-	"CMB_MARK_WX_SYN_CX:CMB_MARK_WX_SYN_CX"
-	"CMB_FWEdu_V2_CX:CMB_FWEdu_V2_CX"
-	"CMB_WX_SYN_CX:CMB_WX_SYN_CX"
-)
-MODELS=(
-	"CMB_MARK_CX:CMB_MARK_CX"
+	"CMB_A:CMB_A"
+	"CMB_F:CMB_F"
+	"CMB_S:CMB_S"
 )
 
-COLLECTION_SLUGS=( "CMB" )
-# COLLECTION_SLUGS=( "OMB" )
+
+COLLECTION_SLUGS=( "xxx" )
+# COLLECTION_SLUGS=( "xxx" )
 
 if [[ ${#MODELS[@]} -eq 0 ]]; then
 	echo "No model directories specified in MODELS array." >&2

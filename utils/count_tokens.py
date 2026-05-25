@@ -2,7 +2,7 @@ import json, glob
 
 total_bytes = 0
 total_samples = 0
-for idx_path in glob.glob('/home/sraj/scratch/fwebeduv2_wximpactbench_synthetic/train/index.json', recursive=True):
+for idx_path in glob.glob('/home/xxx/scratch/xxx/train/index.json', recursive=True):
     with open(idx_path) as f:
         meta = json.load(f)
     for shard in meta['shards']:

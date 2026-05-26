@@ -1,28 +1,4 @@
-# Climate-ModernBERT
-
-Code, configs, and scripts that go with the paper
 **"Climate-ModernBERT: Revisiting Corpus Composition for Domain-Adaptive Continued Pretraining."**
-
-This repo doesn't ship the trained checkpoints or the raw corpora — the corpora are licensed and the checkpoints are large. What it does ship is everything you need to reproduce the pipeline end-to-end: data curation, two-stage continued pretraining, parameter-space merging, and the nine-task evaluation.
-
-> **Anonymization note (for reviewers).** Cluster paths, HuggingFace usernames, W&B entities, and SLURM account codes have been replaced with `xxx` and a short comment explaining what the original was. The merge configs under `model_merging/merge_configs/` use `xxx/CMB_A`, `xxx/CMB_F`, `xxx/CMB_S`, and `xxx/CMB_Base` as placeholder repo IDs — they correspond directly to the paper's $\theta_{\{\mathcal{A}\}}^{\textsc{lrd}}$, $\theta_{\{\mathcal{F}\}}^{\textsc{lrd}}$, $\theta_{\{\mathcal{S}\}}^{\textsc{lrd}}$, and $\theta_{\textit{base}}$.
-
----
-
-## What's in the paper, and where it lives in the repo
-
-The paper has four moving parts. Here's the one-line map.
-
-| Paper section | Where to look |
-|---|---|
-| §3.1 Data Curation — academic ($\mathcal{A}$), web ($\mathcal{F}$), synthetic ($\mathcal{S}$) | `src/data/` (XML/PDF extraction, dedup, decontamination), `continue_pretrain/data_pipeline/` (NeMo-Curator + FineWeb streaming filter), `src/synthetic/` (Qwen3 vLLM generation) |
-| §3.2 Training Schedule — Phase 1 stable LR + Phase 2 LRD | `continue_pretrain/context_ext.sh` + `modernbert-base-context-extension.yaml` (Phase 1); `continue_pretrain/lr_decay.sh` + `modernbert-base-learning-rate-decay.yaml` (Phase 2) |
-| §4.1 Joint-training variants (7 checkpoints, with and without LRD) | Same Composer configs, different `data_local` and `run_name` per corpus subset |
-| §4.1 Parameter-space merging (Soup / Task-Arithmetic / TIES / DARE) | `model_merging/merge.sh` driving `model_merging/merge_configs/*.yaml` via mergekit |
-| §4.3 Nine-task evaluation (Det., Comm., Spec., Sent., NetZ., TCFD, WFB, WXI, ClimRetrieve) | `eval/config_updated.json`, `eval/multitask_finetuning_updated.py`, `eval/multitask_finetuning_10seeds.py` (for the n=10 paired-seed synthetic ablation in §5.1) |
-| §5.2 Drop-one Soup ablation (Figure: drop-one radar) | The four `merge_drop_*.yaml` configs and `merge_all.yaml` |
-
----
 
 ## Repo layout
 
@@ -76,11 +52,9 @@ ClimateModernBERT/
     └── deduplicate-text-datasets/                      # Google submodule used by src/data/deduplication.py
 ```
 
-The `seed/`, `synthetic data/`, and `Writing/` folders that may exist on disk are git-ignored on purpose — they hold the unredistributable seed corpora, intermediate generations, and paper drafts.
-
 ---
 
-## How to reproduce, end to end
+## How to reproduce, end-to-end
 
 There are four stages. Each one can run independently if you bring your own intermediate artifacts.
 
@@ -174,15 +148,6 @@ Tested on 4× A100 (Phase 1 takes ~7 days on the academic corpus, less on the ot
 The merge step needs `mergekit` (installed inline by `merge.sh`). The synthetic-data step needs a vLLM server with `Qwen/Qwen3-30B-A3B-Instruct-2507`.
 
 The repo is set up for SLURM (you'll see `#SBATCH` directives and a `module load dev2025a cuda/12.x` at the top of each launcher). If you're on a different cluster, swap those lines and the `/scratch/xxx`, `/home/xxx`, `--account=xxx` placeholders for whatever your site uses.
-
----
-
-## A note on what's *not* released
-
-- The raw academic corpus ($\mathcal{A}$) — publisher-licensed, can't redistribute. The pipeline that produces it is in `src/data/`.
-- The synthetic generations ($\mathcal{S}$) — large; the generator and seed-selection logic are in `src/synthetic/`.
-- Per-journal token counts and the FastText filter checkpoint — released alongside the model checkpoints on HF (see paper App. B–C for filenames).
-- Paper drafts and analysis spreadsheets — kept private; they live in `Writing/` and were removed from the repo before release.
 
 ---
 

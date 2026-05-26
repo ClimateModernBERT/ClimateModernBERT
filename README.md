@@ -1,4 +1,4 @@
-<img width="617" height="409" alt="Screenshot 2026-05-26 at 12 41 00 AM" src="https://github.com/user-attachments/assets/31507bd8-6eda-44bb-92d3-89cf65efa166" />**"Climate-ModernBERT: Revisiting Corpus Composition for Domain-Adaptive Continued Pretraining."**
+**"Climate-ModernBERT: Revisiting Corpus Composition for Domain-Adaptive Continued Pretraining."**
 
 <div align="center">
     <img src="./pics/pipeline.png" alt="Link to PDF" height="auto" style="width:95%;">

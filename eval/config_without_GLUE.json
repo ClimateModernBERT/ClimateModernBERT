@@ -75,9 +75,9 @@
   },
 
   "defaults": {
-    "base_model_path": "sraj/CMB_MICH_FWEdu_DEDUP_CX",
-    "base_save_dir": "/cluster/scratch/yongyu/ClimateModernBERT/finetuned_CMB_MICH_FWEdu_DEDUP_CX",
-    "benchmark_output_dir": "/cluster/scratch/yongyu/ClimateModernBERT/ClimateBERT-benchmark-results/finetuned_CMB_MICH_FWEdu_DEDUP_CX",
+    "base_model_path": "xxx/CMB_A_F_dedup",
+    "base_save_dir": "/path/to/xxx/finetuned_CMB_A_F_dedup",
+    "benchmark_output_dir": "/path/to/xxx/benchmark_results/finetuned_CMB_A_F_dedup",
     "training": {
       "learning_rate": 4e-5,
       "num_train_epochs": 10,

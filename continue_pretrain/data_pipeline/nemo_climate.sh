@@ -40,4 +40,5 @@ uv pip install nemo-curator[deduplication_cuda12]
 python nemo_pipeline_climate.py --input-dir data/ --output-dir data_cleaned/        # runs all 3 stages
 
 
-hpc_notify "✅ Finished: Synthetic Data Deduplication"
+# `hpc_notify` is a cluster-local helper (Slack notifier). Drop or replace with your own:
+# hpc_notify "✅ Finished: Synthetic Data Deduplication"

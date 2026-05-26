@@ -1,11 +1,13 @@
+# Uniform weight averaging (Model Soup) of the three single-source LRD checkpoints.
+# Replace `xxx` with your HF org / namespace that holds the three CMB_* checkpoints.
 models:
-  - model: A
+  - model: xxx/CMB_A    # xxx = your HF org; CMB_A = academic-only LRD checkpoint (θ_{A}^LRD)
     parameters:
       weight: 1.0
-  - model: F
+  - model: xxx/CMB_F    # xxx = your HF org; CMB_F = FineWeb-only LRD checkpoint (θ_{F}^LRD)
     parameters:
       weight: 1.0
-  - model: S
+  - model: xxx/CMB_S    # xxx = your HF org; CMB_S = synthetic-only LRD checkpoint (θ_{S}^LRD)
     parameters:
       weight: 1.0
 merge_method: linear

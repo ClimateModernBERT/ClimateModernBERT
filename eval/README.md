@@ -1,25 +1,3 @@
-WXimpactBENCH - not synthetic
-
-Michaelyya/contrarian-claims -- Not sure if used
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Multi-task ModernBERT Fine-tuning and Benchmarking System
 
 This directory contains a restructured system for fine-tuning ModernBERT on multiple tasks and benchmarking their performance.

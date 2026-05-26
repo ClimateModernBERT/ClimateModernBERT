@@ -1,4 +1,4 @@
-data_local: /scratch/data
+data_local: /scratch/xxx/data  # xxx = your local MDS-converted training shards directory
 
 
 data_remote: # If blank, files must be present in data_local
@@ -150,11 +150,11 @@ callbacks:
 loggers:
   wandb:
     project: ModernBert
-    entity: story_gen
+    entity: xxx  # xxx = your W&B entity / team name
 
 save_interval: 3000ba
 save_num_checkpoints_to_keep: -1  # Important, this cleans up checkpoints saved to DISK
-save_folder: /home/sraj/scratch/MBcheckpoints/{run_name}
+save_folder: /home/xxx/scratch/MBcheckpoints/{run_name}  # xxx = your cluster home / scratch root
 
 
 load_path: provided_checkpoints/modernbert-base-context-extension/context-extension/ep0-ba52988-rank0.pt

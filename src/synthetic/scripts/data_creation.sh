@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-core=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
-#SBATCH --account=a-infra01-1
+#SBATCH --account=xxx          # xxx = your SLURM project / account code
 #SBATCH --job-name=climate-data-creation
 #SBATCH --output=climate-data-creation.log
 #SBATCH --error=climate-data-creation.log
@@ -14,7 +14,7 @@
 
 ANNOTATOR_MODEL="Qwen3-30B"
 FULL_ANNOTATOR_MODEL="Qwen/Qwen3-30B-A3B-Instruct-2507"
-ROOT="/iopsstor/scratch/cscs/jni/ClimateModernBERT"
+ROOT="/path/to/xxx/ClimateModernBERT"   # xxx = your local clone of this repo on the cluster
 
 VLLM_LOG="$ROOT/vllm_qwen3_30b.log"
 CACHE_DIR="$ROOT/vllm_cache"
@@ -24,11 +24,11 @@ SEED=42
 MAX_SEEDS=200
 SAMPLES_PER_SEED=1
 N_THREADS=128
-HF_REPO="JingweiNi/climate-news-synthetic-seed-42"
+HF_REPO="xxx/climate-news-synthetic-seed-42"   # xxx = your HF username / org for uploading generated shards
 
-export HF_HOME="/iopsstor/scratch/cscs/jni/hf_home"
+export HF_HOME="/path/to/xxx/hf_home"           # xxx = a scratch dir for HF caches
 export CUDA_VISIBLE_DEVICES=0,1,2,3
-export TIKTOKEN_ENCODINGS_BASE="/iopsstor/scratch/cscs/jni/tiktoken_encodings"
+export TIKTOKEN_ENCODINGS_BASE="/path/to/xxx/tiktoken_encodings"   # xxx = local tiktoken cache
 huggingface-cli login --token $HUGGINGFACE_TOKEN
 
 VLLM_CMD="vllm serve $FULL_ANNOTATOR_MODEL --tensor-parallel-size 4"

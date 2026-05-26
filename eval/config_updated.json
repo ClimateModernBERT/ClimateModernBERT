@@ -74,7 +74,7 @@
     },
     "clim_retrieve": {
       "type": "retrieval_binary_classification",
-      "local_data_path": "/cluster/project/sachan/ClimateModernBERT/finetuning/ClimRetrieve/Report-Level Dataset/ClimRetrieve_ReportLevel_V1.csv",
+      "local_data_path": "/path/to/xxx/ClimRetrieve_ReportLevel_V1.csv",
       "query_column": "question",
       "text_column": "paragraph",
       "label_column": "relevance",
@@ -85,9 +85,9 @@
   },
 
   "defaults": {
-    "base_model_path": "sraj/Merge_CMB_MARK_CX_LRD_CMB_FWEdu_V2_CX_LRD_CMB_WX_SYN_CX_LRD",
-    "base_save_dir": "/cluster/scratch/yongyu/ClimateModernBERT/finetuned_Merge_CMB_MARK_CX_LRD_CMB_FWEdu_V2_CX_LRD_CMB_WX_SYN_CX_LRD",
-    "benchmark_output_dir": "/cluster/scratch/yongyu/ClimateModernBERT/ClimateBERT-benchmark-results/finetuned_Merge_CMB_MARK_CX_LRD_CMB_FWEdu_V2_CX_LRD_CMB_WX_SYN_CX_LRD",
+    "base_model_path": "xxx/CMB_Soup_A_F_S",
+    "base_save_dir": "/path/to/xxx/finetuned_CMB_Soup_A_F_S",
+    "benchmark_output_dir": "/path/to/xxx/benchmark_results/finetuned_CMB_Soup_A_F_S",
     "training": {
       "learning_rate": 4e-5,
       "num_train_epochs": 10,

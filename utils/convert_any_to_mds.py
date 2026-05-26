@@ -180,39 +180,42 @@ def convert_to_mds(
 # Example usage
 if __name__ == '__main__':
     sources = [
-        # SYNTHETIC 
+        # SYNTHETIC corpus (S): output of the NeMo Curator pipeline on synthetic generations
         {
-            'type': 'jsonl', 
-            'path': '/home/xxx/data/mbert/nemo_curator/synthetic/final_pretrain_data.jsonl',
+            'type': 'jsonl',
+            # xxx = your scratch root; second xxx = output dir of nemo_pipeline_climate.py for S
+            'path': '/home/xxx/data/xxx/nemo_curator/synthetic/final_pretrain_data.jsonl',
             'text_key': 'text'
         },
-        # ACADEMIC
+        # ACADEMIC corpus (A): output of the NeMo Curator pipeline on academic / journal text
         {
-            'type': 'jsonl', 
-            'path': '/home/xxx/data/mbert/nemo_curator/academic/final_pretrain_data.jsonl',
+            'type': 'jsonl',
+            # xxx = your scratch root; second xxx = output dir of nemo_pipeline_climate.py for A
+            'path': '/home/xxx/data/xxx/nemo_curator/academic/final_pretrain_data.jsonl',
             'text_key': 'text'
         },
-        # # HuggingFace dataset
+        # FineWeb-Edu climate-filtered subset (F): pushed to HF Hub by stream_filter_upload_fineweb.py
         {
             'type': 'huggingface',
-            'dataset': 'xxx/yyy',
+            'dataset': 'xxx/fineweb-edu-climate',   # xxx = your HF org / username
             'split': 'train',
             'text_key': 'text',
             'streaming': True  # Stream to avoid downloading all at once
         },
-        # Another HuggingFace dataset
+        # Optional second HF source (e.g. additional climate corpus)
         {
             'type': 'huggingface',
-            'dataset': 'xxx/yyy',
+            'dataset': 'xxx/another-climate-corpus', # xxx = your HF org / username; replace with whatever extra corpus you want to mix in
             # 'subset': '20220301.en',
             'split': 'train',
             'text_key': 'text',
             'streaming': True
         },
     ]
-    
+
     convert_to_mds(
         sources=sources,
+        # xxx = your scratch root; second xxx = output MDS dataset dir (matches `data_local` in the YAML configs)
         output_dir='/home/xxx/scratch/xxx',
         compression=None,
         size_limit=64 * 1024 * 1024  # 64MB shards

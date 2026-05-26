@@ -2,6 +2,7 @@ import json, glob
 
 total_bytes = 0
 total_samples = 0
+# xxx = your scratch root; the inner xxx is the MDS dataset directory you converted with convert_any_to_mds.py
 for idx_path in glob.glob('/home/xxx/scratch/xxx/train/index.json', recursive=True):
     with open(idx_path) as f:
         meta = json.load(f)

@@ -33,8 +33,8 @@ if [[ -z "${HF_TOKEN}" ]]; then
 fi
 export HF_TOKEN
 
-BASE_PATH="/home/xxx/scratch"
-HF_NAMESPACE="xxx"
+BASE_PATH="/home/xxx/scratch"      # xxx = your scratch root containing the HF-format checkpoint dirs from convert_to_hf.sh
+HF_NAMESPACE="xxx"                 # xxx = your HF username / org that will own the uploaded model repos
 MAKE_PRIVATE="false"
 DELETE_EXISTING="false"
 
@@ -45,8 +45,7 @@ MODELS=(
 )
 
 
-COLLECTION_SLUGS=( "xxx" )
-# COLLECTION_SLUGS=( "xxx" )
+COLLECTION_SLUGS=( "xxx" )         # xxx = HF collection slug to add the uploaded repos to (leave empty to skip)
 
 if [[ ${#MODELS[@]} -eq 0 ]]; then
 	echo "No model directories specified in MODELS array." >&2
@@ -104,4 +103,5 @@ for entry in "${MODELS[@]}"; do
 	python "${PYTHON_SCRIPT}" "${python_args[@]}"
 done
 
-hpc_notify "✅ Completed: Model Upload"
+# `hpc_notify` is a cluster-local helper (Slack notifier). Drop or replace with your own:
+# hpc_notify "✅ Completed: Model Upload"

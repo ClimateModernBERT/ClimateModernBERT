@@ -1,15 +1,17 @@
+# Task Arithmetic with scaling factor lambda=0.5 over the three single-source LRD checkpoints.
+# Replace `xxx` with your HF org / namespace.
 models:
-  - model: A
+  - model: xxx/CMB_A          # xxx = your HF org; CMB_A = academic-only LRD checkpoint
     parameters:
       weight: 1.0
-  - model: F
+  - model: xxx/CMB_F          # xxx = your HF org; CMB_F = FineWeb-only LRD checkpoint
     parameters:
       weight: 1.0
-  - model: S
+  - model: xxx/CMB_S          # xxx = your HF org; CMB_S = synthetic-only LRD checkpoint
     parameters:
       weight: 1.0
 merge_method: task_arithmetic
-base_model: B
+base_model: xxx/CMB_Base      # xxx = your HF org; CMB_Base = stable-phase ModernBERT-base init
 parameters:
   normalize: true
   lambda: 0.5

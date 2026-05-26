@@ -1,8 +1,10 @@
+# Drop-one Soup that excludes the FineWeb corpus F (Soup({A, S})).
+# Replace `xxx` with your HF org / namespace.
 models:
-  - model: A
+  - model: xxx/CMB_A    # xxx = your HF org; CMB_A = academic-only LRD checkpoint
     parameters:
       weight: 1.0
-  - model: S
+  - model: xxx/CMB_S    # xxx = your HF org; CMB_S = synthetic-only LRD checkpoint
     parameters:
       weight: 1.0
 merge_method: linear

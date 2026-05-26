@@ -1,7 +1,7 @@
 **"Climate-ModernBERT: Revisiting Corpus Composition for Domain-Adaptive Continued Pretraining."**
 
 <div align="center">
-    <img src="./pics/pipeline.png" alt="Link to PDF" height="auto" style="width:95%;">
+    <img src="./main.png" alt="Link to PDF" height="auto" style="width:95%;">
 </div>
 
 ## Repo layout

@@ -32,7 +32,7 @@ STAGE_LABEL = {
 AMBIGUITY_NOTE = (
     "> **Mapping under review.** This checkpoint's correspondence to a configuration in "
     "the manuscript is not fully settled; see the *Open questions* section of "
-    "[docs/model-naming.md](https://github.com/Michaelyya/ClimateModernBERT/blob/main/docs/model-naming.md).\n"
+    "[docs/model-naming.md](https://github.com/ClimateModernBERT/ClimateModernBERT/blob/main/docs/model-naming.md).\n"
 )
 
 RECOMMENDED_ID = "CMB-ClimateModernBERT/Merge_Soup_LRD"

@@ -116,10 +116,10 @@ scientific literature and climate news.
 Pretraining.** Preprint manuscript, currently under review — no venue, DOI or arXiv
 identifier yet, and no citation to give. The PDF is hosted in the project repository.
 
-- Project website: https://michaelyya.github.io/ClimateModernBERT/
-- Code and pipelines: https://github.com/Michaelyya/ClimateModernBERT
-- Full model catalog: https://github.com/Michaelyya/ClimateModernBERT/blob/main/docs/model-inventory.md
-- Naming guide: https://github.com/Michaelyya/ClimateModernBERT/blob/main/docs/model-naming.md
+- Project website: https://climatemodernbert.github.io/ClimateModernBERT/
+- Code and pipelines: https://github.com/ClimateModernBERT/ClimateModernBERT
+- Full model catalog: https://github.com/ClimateModernBERT/ClimateModernBERT/blob/main/docs/model-inventory.md
+- Naming guide: https://github.com/ClimateModernBERT/ClimateModernBERT/blob/main/docs/model-naming.md
 
 ## License
 

@@ -7,7 +7,7 @@ on three climate corpora — academic climate text, climate-filtered web data, a
 climate text — and a study of whether those sources are better combined *during* training
 or *after* it, in parameter space.
 
-[**Project website**](https://michaelyya.github.io/ClimateModernBERT/) ·
+[**Project website**](https://climatemodernbert.github.io/ClimateModernBERT/) ·
 [**Paper (PDF)**](./paper/climate-modernbert.pdf) ·
 [**Models on Hugging Face**](https://huggingface.co/CMB-ClimateModernBERT) ·
 [**Model inventory**](./docs/model-inventory.md)

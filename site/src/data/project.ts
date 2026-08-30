@@ -1,4 +1,10 @@
 /**
+ * The canonical GitHub location. Every other GitHub URL in this file is derived
+ * from it, so moving the repository is a one-line change here.
+ */
+const GITHUB = "https://github.com/ClimateModernBERT/ClimateModernBERT";
+
+/**
  * Project-level facts.
  *
  * SOURCE OF TRUTH: paper/climate-modernbert.pdf (manuscript, under review).
@@ -19,7 +25,7 @@ export const project = {
     "Natural Language Processing (NLP) in the climate domain requires models to process heterogeneous text sources, including scientific literature, policy disclosures, and synthetic reports. However, how to effectively combine diverse domain corpora during continued pretraining (CPT) remains underexplored. We introduce Climate-ModernBERT, a family of climate-adapted encoder models obtained through continued pretraining of ModernBERT-Base on three climate corpora: academic climate text, climate-filtered web data, and synthetic climate documents. We systematically compare joint continued pretraining on corpus mixtures with parameter-space merging of independently specialized checkpoints. Across nine climate NLP benchmarks, our best model achieves 76.3 average F1, improving significantly over a climate-adapted ModernBERT baseline by 2.8 points. Within the climate NLP setting, the results show that academic climate corpora provide the strongest adaptation signal among the evaluated sources, while parameter-space merging improves over joint multi-source training and better preserves complementary information from heterogeneous climate corpora. We release all Climate-ModernBERT variants and training checkpoints to support future research in climate NLP and domain-adaptive pretraining.",
 
   links: {
-    github: "https://github.com/Michaelyya/ClimateModernBERT",
+    github: GITHUB,
     /** The organization the paper's checkpoints are published under. */
     hfOrgPage: "https://huggingface.co/CMB-ClimateModernBERT",
     /** Curated "final models from the paper" collection under the legacy account. */
@@ -178,42 +184,42 @@ export const project = {
       title: "Data preparation",
       body:
         "Academic XML/PDF extraction, suffix-array deduplication, decontamination against all nine eval sets, FineWeb-Edu streaming filter, and the NeMo-Curator clean → exact-dedup → fuzzy-dedup pipeline.",
-      href: "https://github.com/Michaelyya/ClimateModernBERT/tree/main/src/data",
+      href: `${GITHUB}/tree/main/src/data`,
     },
     {
       dir: "src/synthetic/",
       title: "Synthetic generation",
       body:
         "Seed selection, the three style templates, and the vLLM driver that produces the 𝒮 corpus. Three SLURM jobs at seeds 42 / 43 / 44 for variance.",
-      href: "https://github.com/Michaelyya/ClimateModernBERT/tree/main/src/synthetic",
+      href: `${GITHUB}/tree/main/src/synthetic`,
     },
     {
       dir: "continue_pretrain/",
       title: "Continued pretraining",
       body:
         "Composer / FlexBERT configs for Phase 1 (context extension) and Phase 2 (LRD specialization), plus the SLURM launchers. Re-point data_local and run_name for each corpus subset.",
-      href: "https://github.com/Michaelyya/ClimateModernBERT/tree/main/continue_pretrain",
+      href: `${GITHUB}/tree/main/continue_pretrain`,
     },
     {
       dir: "model_merging/",
       title: "Parameter-space merging",
       body:
         "Ten mergekit configurations covering Soup, Task Arithmetic, TIES, DARE-TIES, and the drop-one ablations, with a driver that runs mergekit and pushes to the Hub.",
-      href: "https://github.com/Michaelyya/ClimateModernBERT/tree/main/model_merging",
+      href: `${GITHUB}/tree/main/model_merging`,
     },
     {
       dir: "eval/",
       title: "Evaluation",
       body:
         "Multitask fine-tuning across the nine benchmarks at n=3 seeds, the n=10 paired-seed variant used for the synthetic ablation, and the scoring harness.",
-      href: "https://github.com/Michaelyya/ClimateModernBERT/tree/main/eval",
+      href: `${GITHUB}/tree/main/eval`,
     },
     {
       dir: "utils/",
       title: "Conversion & release",
       body:
         "JSONL/HF → MosaicML Streaming (MDS) shard packing, Composer checkpoint → HF Transformers conversion, and Hub upload helpers.",
-      href: "https://github.com/Michaelyya/ClimateModernBERT/tree/main/utils",
+      href: `${GITHUB}/tree/main/utils`,
     },
   ],
 } as const;

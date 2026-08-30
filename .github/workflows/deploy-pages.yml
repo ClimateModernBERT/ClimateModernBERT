@@ -25,13 +25,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         # The site does not need third_party/, and skipping submodules keeps
         # the build from depending on an external repository staying reachable.
         with:
           submodules: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -51,8 +51,11 @@ jobs:
         # the repository name. Rename the repo and that value must change too.
         run: npm run build
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      # Requires Pages to be enabled first:
+      # Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+      # Without that this step fails with "Get Pages site failed".
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: site/dist
 
@@ -64,4 +67,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,114 @@
+---
+import { withBase } from "../lib/base";
+import { project } from "../data/project";
+---
+<section class="hero" id="top">
+  <div class="wrap hero__inner">
+    <p class="hero__status">
+      <span class="dot" aria-hidden="true"></span>{project.status}
+    </p>
+
+    <h1 class="hero__title">ClimateModernBERT</h1>
+    <p class="hero__sub">{project.tagline}</p>
+    <p class="hero__blurb">{project.blurb}</p>
+
+    <div class="hero__actions">
+      <a class="btn btn--primary" href={withBase(project.links.paperPdf)}>
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M4 1.5h5.2L13 5.3V14a.5.5 0 01-.5.5h-9A.5.5 0 013 14V2a.5.5 0 01.5-.5zM9 2.6V5.5h2.9L9 2.6z"/></svg>
+        Paper (PDF)
+      </a>
+      <a class="btn" href={project.links.hfOrgPage} rel="noopener">Models on Hugging Face</a>
+      <a class="btn" href={project.links.github} rel="noopener">GitHub</a>
+      <a class="btn" href="#models">Explore models →</a>
+    </div>
+
+    <dl class="hero__stats">
+      {project.scale.map((s) => (
+        <div class="stat">
+          <dt class="stat__v">{s.value}</dt>
+          <dd class="stat__l">{s.label}<span class="stat__n">{s.note}</span></dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+  }
+  /* One restrained atmospheric wash — no full-page gradient. */
+  .hero::before {
+    content: "";
+    position: absolute; inset: -40% -10% auto -10%; height: 130%;
+    background:
+      radial-gradient(48% 42% at 18% 8%,  color-mix(in srgb, var(--c-a) 13%, transparent), transparent 70%),
+      radial-gradient(44% 38% at 78% 0%,  color-mix(in srgb, var(--c-f) 11%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+  .hero__inner {
+    position: relative;
+    padding-block: clamp(3.5rem, 9vw, 6.5rem) clamp(2.5rem, 6vw, 4rem);
+    max-width: var(--page);
+  }
+
+  .hero__status {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: .75rem; font-weight: 600; letter-spacing: .04em;
+    color: var(--fg-muted);
+    border: 1px solid var(--line-strong); border-radius: 999px;
+    padding: .25rem .75rem .25rem .6rem;
+    background: var(--bg-raised);
+    margin: 0 0 1.5rem;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); flex: none;
+  }
+
+  .hero__title {
+    font-size: clamp(2.4rem, 7vw, 4.1rem);
+    letter-spacing: -.035em;
+    font-weight: 680;
+    margin-bottom: .5rem;
+  }
+  .hero__sub {
+    font-family: var(--font-serif);
+    font-size: clamp(1.15rem, 2.8vw, 1.6rem);
+    line-height: 1.35;
+    color: var(--fg-muted);
+    max-width: 30ch;
+    margin: 0 0 1.5rem;
+  }
+  .hero__blurb {
+    max-width: 62ch;
+    font-size: 1.05rem;
+    color: var(--fg-muted);
+    margin-bottom: 2rem;
+  }
+
+  .hero__actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 3rem; }
+
+  .hero__stats {
+    display: grid; gap: 1.5rem 2rem; margin: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    padding-top: 1.75rem;
+  }
+  @media (min-width: 820px) { .hero__stats { grid-template-columns: repeat(4, 1fr); } }
+
+  .stat { margin: 0; }
+  .stat__v {
+    font-size: clamp(1.7rem, 4vw, 2.25rem);
+    font-weight: 660; letter-spacing: -.03em; line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+  }
+  .stat__l {
+    display: block; margin: .35rem 0 0;
+    font-size: .875rem; font-weight: 560; color: var(--fg);
+  }
+  .stat__n { display: block; font-weight: 400; font-size: .8125rem; color: var(--fg-faint); margin-top: .1rem; }
+</style>

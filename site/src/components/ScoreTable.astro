@@ -1,0 +1,61 @@
+---
+import { taskOrder, type ScoreRow } from "../data/results";
+
+interface Group { heading?: string; rows: ScoreRow[]; }
+interface Props { groups: Group[]; caption: string; id: string; }
+const { groups, caption, id } = Astro.props;
+
+// Bold the column leader across every row shown in THIS table, matching how the
+// manuscript bolds within a table rather than across the whole paper.
+const all = groups.flatMap((g) => g.rows);
+const best = taskOrder.map((_, i) => Math.max(...all.map((r) => r.scores[i][0])));
+const bestAvg = Math.max(...all.map((r) => r.avg[0]));
+---
+<figure class="tblfig">
+  <div class="tbl-scroll" tabindex="0" role="region" aria-labelledby={`${id}-cap`}>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th scope="col">Model</th>
+          {taskOrder.map((t) => <th scope="col">{t}</th>)}
+          <th scope="col" class="avg">Avg.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {groups.map((g) => (
+          <>
+            {g.heading && (
+              <tr class="grp"><td colspan={taskOrder.length + 2}>{g.heading}</td></tr>
+            )}
+            {g.rows.map((r) => (
+              <tr>
+                <th scope="row">
+                  {r.label}
+                  {r.note && <span class="rownote">{r.note}</span>}
+                </th>
+                {r.scores.map(([m, sd], i) => (
+                  <td class={m === best[i] ? "best" : ""}>
+                    {m.toFixed(1)}<span class="sd">±{sd.toFixed(1)}</span>
+                  </td>
+                ))}
+                <td class={`avg ${r.avg[0] === bestAvg ? "best" : ""}`}>
+                  {r.avg[0].toFixed(1)}<span class="sd">±{r.avg[1].toFixed(1)}</span>
+                </td>
+              </tr>
+            ))}
+          </>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <figcaption id={`${id}-cap`} class="note">{caption}</figcaption>
+</figure>
+
+<style>
+  .tblfig { margin: 0; }
+  .tbl th[scope="row"] { font-weight: 500; color: var(--fg); }
+  .rownote {
+    display: block; font-weight: 400; font-size: .7rem;
+    color: var(--fg-faint); white-space: normal; max-width: 34ch; margin-top: .1rem;
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+import { withBase } from "../lib/base";
+import { project } from "../data/project";
+---
+<footer class="foot">
+  <div class="wrap foot__inner">
+    <div class="foot__brand">
+      <span class="foot__mark" aria-hidden="true"></span>
+      <div>
+        <strong>ClimateModernBERT</strong>
+        <span>{project.tagline}</span>
+      </div>
+    </div>
+
+    <nav class="foot__links" aria-label="Project links">
+      <a href={withBase(project.links.paperPdf)}>Paper (PDF)</a>
+      <a href={project.links.hfOrgPage} rel="noopener">Hugging Face organization</a>
+      <a href={project.links.hfCollectionAll} rel="noopener">Legacy experimental collection</a>
+      <a href={project.links.github} rel="noopener">GitHub</a>
+      <a href={`${project.links.github}/blob/main/docs/model-naming.md`} rel="noopener">Naming guide</a>
+      <a href={`${project.links.github}/blob/main/docs/model-inventory.md`} rel="noopener">Model inventory</a>
+    </nav>
+
+    <p class="foot__note">
+      {project.status}. Figures on this page are transcribed from the manuscript PDF hosted
+      in this repository; no result here is extrapolated or estimated.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .foot { border-top: 1px solid var(--line); background: var(--bg-sunken); }
+  .foot__inner { padding-block: 2.5rem 3rem; display: grid; gap: 1.5rem; }
+
+  .foot__brand { display: flex; align-items: center; gap: .7rem; }
+  .foot__mark {
+    width: 20px; height: 20px; border-radius: 6px; flex: none;
+    background: linear-gradient(135deg, var(--c-a), var(--c-f) 55%, var(--c-s));
+  }
+  .foot__brand strong { display: block; font-size: .9375rem; }
+  .foot__brand span { display: block; font-size: .8125rem; color: var(--fg-muted); }
+
+  .foot__links { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; }
+  .foot__links a { font-size: .8125rem; color: var(--fg-muted); text-decoration: none; }
+  .foot__links a:hover { color: var(--accent); text-decoration: underline; }
+
+  .foot__note {
+    font-size: .75rem; color: var(--fg-faint); margin: 0;
+    padding-top: 1.5rem; border-top: 1px solid var(--line); max-width: var(--measure);
+  }
+</style>

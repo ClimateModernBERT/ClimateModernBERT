@@ -1,0 +1,253 @@
+---
+import { project } from "../data/project";
+import { sortedModels, hfUrl, repoName, longName, statusLabel, counts, newId, HF_ORG } from "../data/models";
+import { stageShort, corpusName } from "../data/naming";
+
+// The catalog opens on a short featured set rather than all 56 cards; search and
+// filters reveal the rest. sortedModels is already ranked by status then score.
+const FEATURED = 6;
+const featured = new Set(sortedModels.slice(0, FEATURED).map((m) => m.hf_id));
+
+const filters = {
+  corpus: [{ v: "A", label: "Academic" }, { v: "F", label: "Climate Web" }, { v: "S", label: "Synthetic" }],
+  stage:  [{ v: "phase1", label: "Phase 1" }, { v: "phase2", label: "Phase 2" }],
+  family: [{ v: "joint", label: "Joint" }, { v: "merged", label: "Merged" }],
+  status: [{ v: "recommended", label: "Recommended" }, { v: "paper", label: "Paper" },
+           { v: "experimental", label: "Experimental" }, { v: "legacy", label: "Legacy" },
+           { v: "superseded", label: "Superseded" }],
+};
+const groupLabel: Record<string, string> = { corpus: "Corpus", stage: "Training", family: "Type", status: "Status" };
+---
+<section class="section" id="models">
+  <div class="wrap">
+    <p class="eyebrow">Model explorer</p>
+    <h2 class="section-title">{counts.total} checkpoints, named by what they contain</h2>
+    <p class="section-lede">
+      The paper's checkpoints are republished under
+      <a href={`https://huggingface.co/${HF_ORG}`} rel="noopener">{HF_ORG}</a> with names that
+      read as the paper's own notation — corpora in <code>A_S_F</code> order, then the training
+      stage. The original <code>sraj/*</code> repositories are untouched, so every existing link
+      still works.
+    </p>
+
+    <div class="controls">
+      <div class="search">
+        <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg>
+        <input type="search" id="model-search" placeholder="Search all 56 checkpoints…"
+               aria-label="Search models by repository or display name" autocomplete="off" />
+      </div>
+      {Object.entries(filters).map(([group, opts]) => (
+        <fieldset class="fset" data-group={group}>
+          <legend>{groupLabel[group]}</legend>
+          {opts.map((o) => (
+            <label class="chipbox"><input type="checkbox" value={o.v} /><span>{o.label}</span></label>
+          ))}
+        </fieldset>
+      ))}
+      <button type="button" id="clear-filters" class="clear" hidden>Reset</button>
+    </div>
+
+    <p class="count" id="model-count" role="status" aria-live="polite"></p>
+
+    <ul class="cards" id="model-cards">
+      {sortedModels.map((m) => (
+        <li class="mcard"
+          data-featured={featured.has(m.hf_id) ? "1" : "0"}
+          data-corpus={m.canonical_corpora.join(",")}
+          data-stage={m.stage} data-family={m.family} data-status={m.status}
+          data-search={`${m.hf_id} ${newId(m.hf_id) ?? ""} ${m.display_name} ${m.paper_variant ?? ""} ${m.merge_method ?? ""}`.toLowerCase()}
+        >
+          <div class="mcard__top">
+            <h3 class="mcard__name">{longName(m).replace(/ · /g, " · ")}</h3>
+            {m.avg_f1 !== null && <span class="mcard__f1">{m.avg_f1.toFixed(1)}</span>}
+          </div>
+
+          <a class="mcard__repo mono" href={hfUrl(newId(m.hf_id) ?? m.hf_id)} rel="noopener">
+            {newId(m.hf_id) ? repoName(newId(m.hf_id)!) : repoName(m.hf_id)}
+            <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 2h6v6M10 2 3 9"/></svg>
+          </a>
+          {newId(m.hf_id) && (
+            <a class="mcard__legacy mono" href={hfUrl(m.hf_id)} rel="noopener">
+              was {repoName(m.hf_id)}
+            </a>
+          )}
+
+          <div class="mcard__badges">
+            <span class={`pill pill--${m.status}`}>{statusLabel[m.status]}</span>
+            {m.canonical_corpora.map((c) => <span class={`badge badge--${c.toLowerCase()}`}>{corpusName[c]}</span>)}
+            <span class="badge">{stageShort[m.stage]}</span>
+            {m.family === "merged" && <span class="badge badge--plain">Merged</span>}
+            {m.ambiguous && <span class="badge badge--warn">Unconfirmed</span>}
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <div class="more">
+      <button type="button" id="show-all" class="btn">Show all {counts.total} checkpoints</button>
+    </div>
+    <p class="empty" id="model-empty" hidden>No checkpoints match these filters.</p>
+
+    <p class="note">
+      {counts.ambiguous} checkpoints are marked <em>unconfirmed</em> — their mapping to a
+      manuscript configuration could not be established from the paper, the collection and the
+      merge configs alone. {counts.superseded} are superseded; nothing has been deleted from the
+      Hub. Reasoning in
+      <a href={`${project.links.github}/blob/main/docs/model-naming.md`}>the naming guide</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  .controls {
+    display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; align-items: flex-end;
+    padding: 1.15rem; background: var(--bg-raised);
+    border: 1px solid var(--line); border-radius: var(--radius-lg); margin-bottom: 1rem;
+  }
+  .search { position: relative; flex: 1 1 15rem; min-width: 0; display: flex; align-items: center; }
+  .search svg { position: absolute; left: .7rem; color: var(--fg-faint); pointer-events: none; }
+  .search input {
+    font: inherit; font-size: .875rem; width: 100%;
+    padding: .5rem .8rem .5rem 2.1rem;
+    border: 1px solid var(--line-strong); border-radius: 8px;
+    background: var(--bg); color: var(--fg);
+  }
+  .search input::placeholder { color: var(--fg-faint); }
+
+  .fset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; }
+  .fset legend {
+    float: left; width: 100%; padding: 0 0 .3rem;
+    font-size: .66rem; font-weight: 640; text-transform: uppercase; letter-spacing: .08em; color: var(--fg-faint);
+  }
+  .chipbox { position: relative; }
+  .chipbox input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .chipbox span {
+    display: block; font-size: .75rem; font-weight: 540;
+    padding: .27rem .65rem; border-radius: 999px;
+    border: 1px solid var(--line-strong); background: var(--bg);
+    color: var(--fg-muted); white-space: nowrap; transition: all .12s;
+  }
+  .chipbox input:hover + span { border-color: var(--accent); color: var(--accent); }
+  .chipbox input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .chipbox input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  .clear {
+    font: inherit; font-size: .75rem; font-weight: 540; cursor: pointer;
+    padding: .27rem .65rem; border-radius: 999px;
+    border: 1px solid transparent; background: none; color: var(--fg-faint);
+  }
+  .clear:hover { color: var(--accent); border-color: var(--line-strong); }
+
+  .count { font-size: .8125rem; color: var(--fg-faint); margin: 0 0 1rem; }
+
+  .cards { list-style: none; margin: 0; padding: 0; display: grid; gap: .7rem; }
+  @media (min-width: 700px)  { .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1040px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+  .cards > * { min-width: 0; }
+
+  .mcard {
+    background: var(--bg-raised); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 1rem 1.1rem;
+    display: flex; flex-direction: column;
+  }
+  .mcard[hidden] { display: none; }
+
+  .mcard__top { display: flex; justify-content: space-between; gap: .75rem; align-items: baseline; }
+  .mcard__name { font-size: .875rem; font-weight: 620; line-height: 1.35; }
+  .mcard__f1 {
+    font-size: 1rem; font-weight: 660; font-variant-numeric: tabular-nums;
+    color: var(--accent); flex: none;
+  }
+
+  .mcard__repo {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .72rem; font-weight: 600; color: var(--fg); text-decoration: none;
+    margin-top: .3rem; word-break: break-all;
+  }
+  .mcard__repo:hover { color: var(--accent); text-decoration: underline; }
+  .mcard__repo svg { flex: none; }
+  .mcard__legacy {
+    display: block; font-size: .65rem; color: var(--fg-faint);
+    text-decoration: none; word-break: break-all; margin-top: .15rem;
+  }
+  .mcard__legacy:hover { color: var(--accent); text-decoration: underline; }
+  .mcard__badges { margin-top: auto; padding-top: .7rem; }
+
+  .mcard__badges { display: flex; flex-wrap: wrap; gap: .28rem; margin-top: auto; }
+  .pill {
+    font-size: .6rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    padding: .16rem .42rem; border-radius: 999px; white-space: nowrap;
+    border: 1px solid var(--line-strong); color: var(--fg-faint); background: var(--bg-sunken);
+  }
+  .pill--recommended { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
+  .pill--paper { color: var(--fg); }
+
+  .more { display: flex; justify-content: center; margin-top: 1.25rem; }
+  .empty {
+    text-align: center; color: var(--fg-muted); font-size: .875rem;
+    padding: 2.5rem 1rem; border: 1px dashed var(--line-strong); border-radius: var(--radius-lg);
+  }
+</style>
+
+<script>
+  const cards = [...document.querySelectorAll<HTMLElement>("#model-cards .mcard")];
+  const search = document.getElementById("model-search") as HTMLInputElement | null;
+  const countEl = document.getElementById("model-count")!;
+  const emptyEl = document.getElementById("model-empty")!;
+  const moreEl = document.querySelector<HTMLElement>(".more")!;
+  const showAllBtn = document.getElementById("show-all")!;
+  const clearBtn = document.getElementById("clear-filters")!;
+  const boxes = [...document.querySelectorAll<HTMLInputElement>('.fset input[type="checkbox"]')];
+
+  // Expanded only once the reader asks for it, or as soon as they narrow things down.
+  let expanded = false;
+
+  const selected = (group: string) =>
+    boxes.filter((b) => b.checked && b.closest("fieldset")!.dataset.group === group).map((b) => b.value);
+
+  function apply() {
+    const q = (search?.value ?? "").trim().toLowerCase();
+    const corpus = selected("corpus"), stage = selected("stage");
+    const family = selected("family"), status = selected("status");
+    const narrowed = !!q || corpus.length + stage.length + family.length + status.length > 0;
+
+    let matches = 0, shown = 0;
+    for (const card of cards) {
+      const d = card.dataset;
+      const cs = (d.corpus ?? "").split(",").filter(Boolean);
+      // Within a group the filters are OR: "anything containing Academic".
+      const ok =
+        (!corpus.length || corpus.some((c) => cs.includes(c))) &&
+        (!stage.length || stage.includes(d.stage!)) &&
+        (!family.length || family.includes(d.family!)) &&
+        (!status.length || status.includes(d.status!)) &&
+        (!q || (d.search ?? "").includes(q));
+      if (ok) matches++;
+      // Collapsed and unfiltered: only the featured few.
+      const visible = ok && (narrowed || expanded || d.featured === "1");
+      card.hidden = !visible;
+      if (visible) shown++;
+    }
+
+    const collapsed = !narrowed && !expanded;
+    countEl.textContent = collapsed
+      ? `Showing ${shown} featured of ${cards.length} — search or filter to see the rest`
+      : matches === cards.length
+        ? `Showing all ${cards.length} checkpoints`
+        : `Showing ${matches} of ${cards.length} checkpoints`;
+
+    moreEl.hidden = !collapsed;
+    clearBtn.hidden = !narrowed;
+    emptyEl.hidden = matches > 0;
+  }
+
+  search?.addEventListener("input", apply);
+  boxes.forEach((b) => b.addEventListener("change", apply));
+  showAllBtn.addEventListener("click", () => { expanded = true; apply(); });
+  clearBtn.addEventListener("click", () => {
+    boxes.forEach((b) => (b.checked = false));
+    if (search) search.value = "";
+    apply();
+  });
+  apply();
+</script>

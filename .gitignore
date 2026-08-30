@@ -43,3 +43,18 @@ venv/
 # Logs
 *.log
 *.out
+
+# Website build artifacts
+/site/node_modules/
+/site/dist/
+/site/.astro/
+
+# Copied into site/public/ at build time by site/scripts/copy-assets.mjs
+/site/public/climate-modernbert.pdf
+/site/public/framework-overview.png
+
+# Working notes for the site rebuild (not part of the research code)
+/claudeplan.md
+
+# Weights downloaded by scripts/migrate_to_org.py
+/.migration-cache/

@@ -1,0 +1,176 @@
+---
+import { withBase } from "../lib/base";
+import { project } from "../data/project";
+---
+<section class="section section--sunken" id="method">
+  <div class="wrap">
+    <p class="eyebrow">Method</p>
+    <h2 class="section-title">One base encoder, three corpora, two ways to combine them</h2>
+    <p class="section-lede">
+      Every variant starts from the same ModernBERT-Base checkpoint and sees the same climate
+      text. What changes is <em>where the sources are combined</em> — in the training data, or
+      in parameter space afterwards.
+    </p>
+
+    <!-- Laid out with CSS so it reflows to one column rather than shrinking
+         illegible SVG text on narrow screens. -->
+    <div class="flow">
+      <div class="node node--base">
+        <strong>ModernBERT-Base</strong>
+        <span>150M parameters · 8,192-token context · 4× A100</span>
+      </div>
+
+      <div class="flow__arrow" aria-hidden="true"></div>
+
+      <div class="corpus-row">
+        {project.corpora.map((c) => (
+          <div class={`node node--corpus node--${c.accent}`}>
+            <span class="node__sym">{c.symbol}</span>
+            <strong>{c.name}</strong>
+            <span class="node__tok">{c.tokens} tokens · {c.docs} docs</span>
+          </div>
+        ))}
+      </div>
+
+      <div class="flow__arrow" aria-hidden="true"></div>
+
+      <div class="strategies">
+        <div class="strategy">
+          <span class="strategy__num">I</span>
+          <h3>Joint continued pretraining</h3>
+          <p>One training run over a mixture of corpora. All seven non-empty subsets are trained.</p>
+          <div class="chain">
+            <span class="chip">mixed corpus</span>
+            <span class="chip chip--arrow" aria-hidden="true">→</span>
+            <span class="chip">one CPT run</span>
+            <span class="chip chip--arrow" aria-hidden="true">→</span>
+            <span class="chip chip--out">θ<sub>{"{𝒜,𝒮,ℱ}"}</sub></span>
+          </div>
+          <p class="strategy__score">Full union: <b>74.8</b> avg F1</p>
+        </div>
+
+        <div class="strategy strategy--win">
+          <span class="strategy__num">II</span>
+          <h3>Parameter-space merging</h3>
+          <p>One checkpoint per corpus, trained independently, then combined by weight averaging.</p>
+          <div class="chain">
+            <span class="chip chip--a">θ<sub>𝒜</sub></span>
+            <span class="chip chip--f">θ<sub>ℱ</sub></span>
+            <span class="chip chip--s">θ<sub>𝒮</sub></span>
+            <span class="chip chip--arrow" aria-hidden="true">→</span>
+            <span class="chip chip--out">θ<sub>Soup</sub></span>
+          </div>
+          <p class="strategy__score">Same data: <b>76.3</b> avg F1</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="phases-line">
+      Each configuration runs in two stages, following ModernBERT's own schedule.
+      <span class="badge badge--accent badge--plain">Phase 1 · CX</span>
+      context extension at a constant learning rate, then
+      <span class="badge badge--accent badge--plain">Phase 2 · CX_LRD</span>
+      learning-rate-decay specialization. The Phase-2 checkpoints are the paper's primary
+      models; Phase-1 checkpoints are kept as an ablation isolating what the decay stage adds.
+    </p>
+
+    <figure class="figure">
+      <img
+        src={withBase("framework-overview.png")}
+        width="1232" height="814" loading="lazy" decoding="async"
+        alt="The ClimateModernBERT adaptation framework: three climate corpora feed either joint continued pretraining or independent continued pretraining followed by a parameter-space merge, on a two-phase schedule."
+      />
+      <figcaption>Figure 1 from the manuscript.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .flow { display: grid; gap: 0; margin-bottom: 2rem; }
+
+  .flow__arrow {
+    width: 1px; height: 1.75rem; margin-inline: auto;
+    background: var(--line-strong); position: relative;
+  }
+  .flow__arrow::after {
+    content: ""; position: absolute; bottom: 0; left: 50%;
+    transform: translate(-50%, 1px);
+    border: 4px solid transparent; border-top-color: var(--line-strong);
+  }
+
+  .node {
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: .9rem 1.1rem;
+    display: grid; gap: .15rem;
+  }
+  .node strong { font-size: .9375rem; }
+  .node span { font-size: .8125rem; color: var(--fg-muted); }
+  .node--base { text-align: center; }
+
+  .corpus-row { display: grid; gap: .75rem; }
+  @media (min-width: 720px) { .corpus-row { grid-template-columns: repeat(3, 1fr); } }
+  .corpus-row > * { min-width: 0; }
+
+  .node--corpus { align-content: start; }
+  /* Italic serif rather than the Unicode math-script codepoints, which resolve
+     to different fallback fonts for 𝒜/𝒮 and ℱ and mismatch at this size. */
+  .node__sym { font-family: var(--font-serif); font-style: italic; font-size: 1.5rem; line-height: 1; }
+  .node__tok { font-family: var(--font-mono); font-size: .72rem !important; }
+  .node--a { border-color: color-mix(in srgb, var(--c-a) 40%, var(--line)); }
+  .node--a .node__sym { color: var(--c-a); }
+  .node--f { border-color: color-mix(in srgb, var(--c-f) 40%, var(--line)); }
+  .node--f .node__sym { color: var(--c-f); }
+  .node--s { border-color: color-mix(in srgb, var(--c-s) 40%, var(--line)); }
+  .node--s .node__sym { color: var(--c-s); }
+
+  .strategies { display: grid; gap: .75rem; }
+  @media (min-width: 820px) { .strategies { grid-template-columns: repeat(2, 1fr); } }
+  .strategies > * { min-width: 0; }
+
+  .strategy {
+    background: var(--bg-raised); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); padding: 1.35rem;
+    display: flex; flex-direction: column;
+  }
+  .strategy--win { border-color: var(--accent-line); background: color-mix(in srgb, var(--accent-soft) 45%, var(--bg-raised)); }
+  .strategy__num { font-family: var(--font-mono); font-size: .7rem; font-weight: 700; color: var(--fg-faint); letter-spacing: .1em; }
+  .strategy h3 { font-size: 1.0625rem; margin: .3rem 0 .5rem; }
+  .strategy p { font-size: .875rem; color: var(--fg-muted); }
+
+  .chain { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin: .4rem 0 1rem; }
+  .chip {
+    font-family: var(--font-mono); font-size: .7rem;
+    border: 1px solid var(--line-strong); border-radius: 6px;
+    padding: .25rem .5rem; background: var(--bg-sunken); color: var(--fg-muted); white-space: nowrap;
+  }
+  .chip sub { font-size: .85em; }
+  .chip--arrow { border: 0; background: none; padding: 0 .1rem; color: var(--fg-faint); }
+  .chip--a { color: var(--c-a); border-color: color-mix(in srgb, var(--c-a) 40%, transparent); background: var(--c-a-soft); }
+  .chip--f { color: var(--c-f); border-color: color-mix(in srgb, var(--c-f) 40%, transparent); background: var(--c-f-soft); }
+  .chip--s { color: var(--c-s); border-color: color-mix(in srgb, var(--c-s) 40%, transparent); background: var(--c-s-soft); }
+  .chip--out { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); font-weight: 600; }
+
+  .strategy__score {
+    margin: auto 0 0; padding-top: .85rem; border-top: 1px solid var(--line);
+    font-size: .8125rem; color: var(--fg-muted);
+  }
+  .strategy__score b { font-variant-numeric: tabular-nums; color: var(--fg); font-size: 1rem; }
+
+  .phases-line {
+    font-size: .875rem; color: var(--fg-muted);
+    max-width: var(--measure); margin: 0;
+  }
+  .phases-line .badge { margin: 0 .15rem; vertical-align: baseline; }
+
+  .figure { margin: 2.5rem 0 0; }
+  .figure img {
+    display: block; width: 100%; border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    /* The source figure has a white ground; keep it on white in both themes
+       rather than inverting a project-owned figure. */
+    background: #fff; padding: .5rem;
+  }
+  .figure figcaption { font-size: .8125rem; color: var(--fg-muted); margin-top: .75rem; }
+</style>

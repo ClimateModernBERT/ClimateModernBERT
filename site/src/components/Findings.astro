@@ -1,0 +1,69 @@
+---
+import { project } from "../data/project";
+---
+<section class="section" id="findings">
+  <div class="wrap">
+    <p class="eyebrow">Key findings</p>
+    <h2 class="section-title">Three results from the study</h2>
+    <p class="section-lede">
+      Each is stated as the manuscript states it — scoped to climate NLP, to nine
+      benchmarks, and to the ModernBERT-Base encoder family.
+    </p>
+
+    <ol class="findings">
+      {project.findings.map((f) => (
+        <li class="finding">
+          <div class="finding__head">
+            <span class="finding__n">{f.n}</span>
+            <div class="finding__stat">
+              <span class="finding__value">{f.stat}</span>
+              <span class="finding__label">{f.statLabel}</span>
+            </div>
+          </div>
+          <h3 class="finding__title">{f.title}</h3>
+          <p class="finding__body">{f.body}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .findings {
+    list-style: none; padding: 0; margin: 0;
+    display: grid; gap: 1rem;
+  }
+  @media (min-width: 900px) { .findings { grid-template-columns: repeat(3, 1fr); } }
+
+  .finding {
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: flex; flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .finding::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 2px;
+    background: linear-gradient(90deg, var(--c-a), var(--c-f) 55%, var(--c-s));
+    opacity: .55;
+  }
+  .finding__head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 1rem; margin-bottom: 1rem;
+  }
+  .finding__n {
+    font-family: var(--font-mono); font-size: .75rem; font-weight: 600;
+    color: var(--fg-faint); letter-spacing: .06em; padding-top: .3rem;
+  }
+  .finding__stat { text-align: right; }
+  .finding__value {
+    display: block;
+    font-size: 1.75rem; font-weight: 660; letter-spacing: -.03em; line-height: 1;
+    font-variant-numeric: tabular-nums; color: var(--accent);
+  }
+  .finding__label { display: block; font-size: .7rem; color: var(--fg-faint); margin-top: .3rem; }
+  .finding__title { font-size: 1.0625rem; margin-bottom: .6rem; }
+  .finding__body { font-size: .9rem; color: var(--fg-muted); margin: 0; }
+</style>

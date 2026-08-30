@@ -1,0 +1,65 @@
+---
+import { withBase } from "../lib/base";
+import { project } from "../data/project";
+---
+<section class="section section--sunken" id="paper">
+  <div class="wrap paper">
+    <div>
+      <p class="eyebrow">Paper</p>
+      <h2 class="paper__title">{project.paperTitle}</h2>
+      <p class="paper__status">
+        <span class="badge badge--warn">Under review</span>
+        Unpublished — no venue, DOI or arXiv identifier yet, and no citation to give.
+        The author list is anonymized for review.
+      </p>
+      <p class="paper__abs">
+        We introduce Climate-ModernBERT, a family of climate-adapted encoders obtained by
+        continued pretraining of ModernBERT-Base on academic climate text, climate-filtered web
+        data, and synthetic climate documents. Comparing joint continued pretraining against
+        parameter-space merging of independently specialized checkpoints across nine climate NLP
+        benchmarks, the best model reaches 76.3 average F1 — 2.8 points over the baseline.
+        Academic corpora provide the strongest adaptation signal, and merging outperforms joint
+        multi-source training.
+      </p>
+      <div class="paper__actions">
+        <a class="btn btn--primary" href={withBase(project.links.paperPdf)}>Read the PDF</a>
+        <a class="btn" href={project.links.github} rel="noopener">Code &amp; pipelines</a>
+      </div>
+    </div>
+
+    <aside class="paper__side">
+      <h3>Scope</h3>
+      <ul>
+        <li>English only, one encoder family (ModernBERT-Base).</li>
+        <li>Benchmarks are passage-level, so long-context capacity is not fully exercised.</li>
+        <li>Findings are demonstrated within climate NLP, not as universal principles.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .paper { display: grid; gap: 2rem; }
+  @media (min-width: 900px) { .paper { grid-template-columns: 1.7fr 1fr; } }
+  .paper > * { min-width: 0; }
+
+  .paper__title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.4rem, 3.2vw, 1.95rem);
+    line-height: 1.25; letter-spacing: -.015em; font-weight: 600; margin-bottom: 1rem;
+  }
+  .paper__status {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: .55rem;
+    font-size: .8125rem; color: var(--fg-muted);
+    padding-bottom: 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--line);
+  }
+  .paper__abs { font-size: .9375rem; color: var(--fg-muted); max-width: var(--measure); margin-bottom: 1.5rem; }
+  .paper__actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+  .paper__side {
+    background: var(--bg-raised); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); padding: 1.35rem; align-self: start;
+  }
+  .paper__side h3 { font-size: .875rem; margin-bottom: .6rem; }
+  .paper__side ul { margin: 0; padding-left: 1.1rem; font-size: .8125rem; color: var(--fg-muted); display: grid; gap: .45rem; }
+</style>

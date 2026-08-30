@@ -1,0 +1,29 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Hero from "../components/Hero.astro";
+import Findings from "../components/Findings.astro";
+import Method from "../components/Method.astro";
+import Results from "../components/Results.astro";
+import Merging from "../components/Merging.astro";
+import ModelExplorer from "../components/ModelExplorer.astro";
+import PaperSection from "../components/PaperSection.astro";
+import Footer from "../components/Footer.astro";
+import { project } from "../data/project";
+---
+<Base
+  title="ClimateModernBERT — Revisiting Corpus Composition for Domain-Adaptive Continued Pretraining"
+  description={project.blurb}
+>
+  <Nav />
+  <main id="main">
+    <Hero />
+    <Findings />
+    <Method />
+    <Results />
+    <Merging />
+    <ModelExplorer />
+    <PaperSection />
+  </main>
+  <Footer />
+</Base>

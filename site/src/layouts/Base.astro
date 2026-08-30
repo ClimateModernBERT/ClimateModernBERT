@@ -1,0 +1,37 @@
+---
+import "../styles/global.css";
+import { withBase } from "../lib/base";
+
+interface Props { title: string; description: string; }
+const { title, description } = Astro.props;
+const ogImage = withBase("framework-overview.png");
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href={withBase("favicon.svg")} type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site ?? "https://michaelyya.github.io").href} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Applied before first paint so a stored theme choice never flashes. -->
+    <script is:inline>
+      try {
+        const t = localStorage.getItem("cmb-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch (e) { /* storage blocked — fall back to prefers-color-scheme */ }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>

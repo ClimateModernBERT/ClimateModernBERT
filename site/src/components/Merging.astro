@@ -1,0 +1,82 @@
+---
+import { models, hfUrl, newId, repoName } from "../data/models";
+const soup = models.find((m) => m.hf_id === "sraj/Merge_Linear")!;
+
+const methods = [
+  { name: "Soup", formula: "mean(θ𝒜, θℱ, θ𝒮)", body: "Uniform weight averaging. No hyperparameter, and the best result here.", best: true },
+  { name: "Task Arithmetic", formula: "θbase + λ · Σ δi", body: "Sum the task vectors and scale by λ ∈ {0.5, 1.0}." },
+  { name: "TIES", formula: "trim → elect sign → merge", body: "Drop small entries, resolve sign conflicts, average the rest. d ∈ {0.5, 0.7}." },
+  { name: "DARE-TIES", formula: "drop & rescale → TIES", body: "Randomly drop and rescale before TIES, assuming task vectors are redundant." },
+];
+---
+<section class="section section--sunken" id="merging">
+  <div class="wrap">
+    <p class="eyebrow">Model merging</p>
+    <h2 class="section-title">Combining sources after training, not before</h2>
+    <p class="section-lede">
+      Joint training makes one optimizer reconcile three distributions at once. Merging lets each
+      corpus produce its own checkpoint first. Because those updates are nearly orthogonal, the
+      combination keeps more of what each source contributed.
+    </p>
+
+    <div class="methods">
+      {methods.map((m) => (
+        <article class={`method ${m.best ? "method--best" : ""}`}>
+          <h3>{m.name}{m.best && <span class="tag">best</span>}</h3>
+          <code>{m.formula}</code>
+          <p>{m.body}</p>
+        </article>
+      ))}
+    </div>
+
+    <div class="best-model">
+      <div>
+        <h3>{soup.display_name}</h3>
+        <p class="best-model__note">
+          Uniform average of the three single-source Phase-2 checkpoints, verified from the repo's
+          own <code>mergekit_config.yml</code>. Gains are largest on Commitments (+7.0) and
+          WXImpactBench (+9.3).
+        </p>
+      </div>
+      <div class="best-model__aside">
+        <span class="best-model__score">{soup.avg_f1!.toFixed(1)}</span>
+        <span class="best-model__label">average F1</span>
+        <a class="btn btn--primary" href={hfUrl(newId(soup.hf_id) ?? soup.hf_id)} rel="noopener">
+          {repoName(newId(soup.hf_id) ?? soup.hf_id)}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .methods { display: grid; gap: .75rem; margin-bottom: 1.75rem; }
+  @media (min-width: 720px) { .methods { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1040px) { .methods { grid-template-columns: repeat(4, 1fr); } }
+  .methods > * { min-width: 0; }
+
+  .method { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.15rem; }
+  .method--best { border-color: var(--accent-line); }
+  .method h3 { font-size: .9375rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .45rem; }
+  .tag {
+    font-size: .6rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-line);
+    border-radius: 4px; padding: .1rem .3rem;
+  }
+  .method code { display: block; font-size: .68rem; margin-bottom: .6rem; color: var(--fg-muted); overflow-x: auto; white-space: nowrap; }
+  .method p { font-size: .8125rem; color: var(--fg-muted); margin: 0; }
+
+  .best-model {
+    display: grid; gap: 1.5rem;
+    background: var(--bg-raised); border: 1px solid var(--accent-line);
+    border-radius: var(--radius-lg); padding: 1.6rem;
+  }
+  @media (min-width: 820px) { .best-model { grid-template-columns: 1fr auto; align-items: center; } }
+  .best-model > * { min-width: 0; }
+  .best-model h3 { font-size: 1.15rem; margin-bottom: .5rem; }
+  .best-model__note { font-size: .875rem; color: var(--fg-muted); margin: 0; }
+  .best-model__aside { text-align: center; display: grid; gap: .2rem; justify-items: center; padding-left: 1.5rem; }
+  @media (min-width: 820px) { .best-model__aside { border-left: 1px solid var(--line); } }
+  .best-model__score { font-size: 2.75rem; font-weight: 680; letter-spacing: -.04em; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .best-model__label { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--fg-faint); margin-bottom: .9rem; }
+</style>

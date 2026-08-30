@@ -1,0 +1,245 @@
+---
+import ScoreTable from "./ScoreTable.astro";
+import { baselines, phase1Rows, phase2Rows, mergeRows, cxMergeRows, dropOne, tasks } from "../data/results";
+
+// A truncated domain is honest for a dot plot — no bar length implies a zero
+// baseline — and 0–100 would flatten a four-point spread to nothing.
+const DMIN = 71, DMAX = 77.5;
+const x = (v: number) => ((v - DMIN) / (DMAX - DMIN)) * 100;
+const ticks = [71, 72, 73, 74, 75, 76, 77];
+const baseValue = 73.5;
+
+const headline = [
+  { label: "ClimateBERT",          sub: "prior climate encoder",       value: 72.1, kind: "baseline" },
+  { label: "ModernBERT-base",      sub: "θbase · initialization",      value: 73.5, kind: "baseline" },
+  { label: "Joint 𝒜+𝒮+ℱ",          sub: "Phase 2 · full corpus union", value: 74.8, kind: "joint" },
+  { label: "Best single source 𝒜", sub: "Phase 1 · academic only",     value: 75.3, kind: "joint" },
+  { label: "θSoup",                sub: "weight-averaged merge",       value: 76.3, kind: "merge" },
+];
+---
+<section class="section" id="results">
+  <div class="wrap">
+    <p class="eyebrow">Results</p>
+    <h2 class="section-title">Where the gains come from</h2>
+    <p class="section-lede">
+      Average F1 over nine climate NLP benchmarks, mean of three fine-tuning seeds under one
+      shared recipe. Every figure is transcribed from the manuscript.
+    </p>
+
+    <!-- Emphasis dot plot: θSoup is the point, the rest are context. -->
+    <figure class="chart">
+      <div class="plot">
+        <div class="plot__grid" aria-hidden="true">
+          {ticks.map((t) => <span class="plot__tick" style={`left:${x(t)}%`}><i>{t}</i></span>)}
+          <span class="plot__base" style={`left:${x(baseValue)}%`}></span>
+        </div>
+        <ul class="rows">
+          {headline.map((h) => (
+            <li class={`row row--${h.kind}`}>
+              <div class="row__label">
+                <span class="row__name" set:html={h.label.replace("θSoup", "θ<sub>Soup</sub>")}></span>
+                <span class="row__sub">{h.sub}</span>
+              </div>
+              <div class="row__track">
+                <span class="row__stem" style={`left:${x(Math.min(h.value, baseValue))}%; width:${Math.abs(x(h.value) - x(baseValue))}%`}></span>
+                <span class="row__dot" style={`left:${x(h.value)}%`} title={`${h.value} average F1`}></span>
+                <span class="row__val" style={`left:${x(h.value)}%`}>{h.value.toFixed(1)}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <figcaption class="note">
+        Dashed line marks θ<sub>base</sub>, the checkpoint every variant is adapted from.
+        Axis truncated to 71–77.5.
+      </figcaption>
+    </figure>
+
+    <div class="tabs" data-tabs>
+      <div class="tabs__bar" role="tablist" aria-label="Result tables">
+        <button role="tab" id="tab-p2" aria-controls="panel-p2" aria-selected="true">Phase 2 · joint</button>
+        <button role="tab" id="tab-p1" aria-controls="panel-p1" aria-selected="false">Phase 1 · ablation</button>
+        <button role="tab" id="tab-mg" aria-controls="panel-mg" aria-selected="false">Merged</button>
+      </div>
+
+      <div role="tabpanel" id="panel-p2" aria-labelledby="tab-p2">
+        <ScoreTable id="t-p2"
+          groups={[{ heading: "Baselines", rows: baselines.slice(0, 2) },
+                   { heading: "Climate-ModernBERT · Phase 1 + Phase 2", rows: phase2Rows }]}
+          caption="Table 2, upper block. Bold marks the column leader within this table." />
+      </div>
+      <div role="tabpanel" id="panel-p1" aria-labelledby="tab-p1" hidden>
+        <ScoreTable id="t-p1"
+          groups={[{ heading: "Baselines", rows: baselines.slice(0, 2) },
+                   { heading: "Climate-ModernBERT · Phase 1 only", rows: phase1Rows }]}
+          caption="Table 2, lower block — the ablation isolating LRD specialization. θ𝒜 at 75.3 is the strongest jointly trained configuration in the paper." />
+      </div>
+      <div role="tabpanel" id="panel-mg" aria-labelledby="tab-mg" hidden>
+        <ScoreTable id="t-mg"
+          groups={[{ heading: "Joint training on the union", rows: [phase2Rows[6]] },
+                   { heading: "Parameter-space merges (Table 4)", rows: mergeRows },
+                   { heading: "Appendix F (Table 10)", rows: cxMergeRows }]}
+          caption="All merges cover the same effective corpus as joint training on {𝒜, 𝒮, ℱ}, making this a matched-data comparison." />
+      </div>
+    </div>
+
+    <div class="foot-row">
+      <div class="drop-panel">
+        <h3>Which corpus matters most</h3>
+        <p class="panel__lede">{dropOne.caption}</p>
+        <ul class="drop">
+          {dropOne.rows.map((r) => (
+            <li class="drop__row">
+              <div class="drop__head">
+                <span class="drop__what">
+                  without <span class={`badge badge--${r.key.toLowerCase()}`}>{r.dropped}</span>
+                </span>
+                <span class="drop__d">{r.delta.toFixed(1)}</span>
+              </div>
+              <div class="drop__bar" aria-hidden="true"><span style={`width:${(Math.abs(r.delta) / 4.0) * 100}%`}></span></div>
+            </li>
+          ))}
+        </ul>
+        <p class="note">
+          Removing 𝒜 costs four times as much as removing either other corpus — even though ℱ
+          produces by far the largest parameter update.
+        </p>
+      </div>
+
+      <div class="bench-panel">
+        <h3>The nine benchmarks</h3>
+        <p class="panel__lede">
+          Six single-label classification tasks, two multi-label, one retrieval benchmark cast as
+          binary relevance.
+        </p>
+        <ul class="bench">
+          {tasks.map((t) => (
+            <li class="bench__item">
+              <span class="bench__key">{t.key}</span>
+              <span class="bench__name">{t.name}</span>
+              <span class="bench__type">{t.type}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .chart {
+    margin: 0 0 2.5rem;
+    background: var(--bg-raised); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); padding: 1.5rem;
+  }
+  .plot { position: relative; }
+  .rows { list-style: none; margin: 0; padding: 0 0 1.4rem; display: grid; gap: .4rem; }
+
+  .row { display: grid; gap: .25rem .9rem; grid-template-columns: 1fr; align-items: center; padding: .4rem 0; }
+  @media (min-width: 700px) { .row { grid-template-columns: 14rem 1fr; } }
+
+  .row__label { min-width: 0; }
+  @media (max-width: 699px) {
+    /* Below 700px the label stacks above its track, inside the plot area, so the
+       gridlines would run through the text. Sit it on the card surface. */
+    .row__label { position: relative; z-index: 1; background: var(--bg-raised); padding-right: .5rem; width: fit-content; }
+  }
+  .row__name { display: block; font-size: .875rem; font-weight: 560; }
+  .row__sub { display: block; font-size: .75rem; color: var(--fg-faint); }
+
+  .row__track { position: relative; height: 1.4rem; }
+  /* A stem back to the baseline references the dot without implying zero. */
+  .row__stem { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); background: var(--line-strong); border-radius: 2px; }
+  .row__dot {
+    position: absolute; top: 50%; width: 11px; height: 11px;
+    transform: translate(-50%, -50%); border-radius: 50%;
+    background: var(--fg-faint);
+    box-shadow: 0 0 0 2px var(--bg-raised);   /* 2px surface ring keeps marks separable */
+  }
+  .row__val {
+    position: absolute; top: 50%; transform: translateY(-50%); margin-left: .85rem;
+    font-size: .8125rem; font-variant-numeric: tabular-nums; color: var(--fg-muted); white-space: nowrap;
+  }
+  .row--merge .row__dot { background: var(--accent); width: 13px; height: 13px; }
+  .row--merge .row__stem { background: var(--accent-line); height: 3px; }
+  .row--merge .row__val { color: var(--fg); font-weight: 660; }
+  .row--merge .row__name { font-weight: 660; }
+
+  .plot__grid { position: absolute; inset: 0; pointer-events: none; }
+  @media (min-width: 700px) { .plot__grid { left: 14.9rem; } }
+  .plot__tick { position: absolute; top: 0; bottom: 1.4rem; width: 1px; background: var(--line); }
+  .plot__tick i {
+    position: absolute; bottom: -1.35rem; left: 50%; transform: translateX(-50%);
+    font-style: normal; font-size: .7rem; color: var(--fg-faint); font-variant-numeric: tabular-nums;
+  }
+  .plot__base { position: absolute; top: 0; bottom: 1.4rem; width: 0; border-left: 1px dashed var(--fg-faint); opacity: .8; }
+
+  .tabs { margin-bottom: 2.5rem; }
+  .tabs__bar { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem; }
+  .tabs__bar button {
+    font: inherit; font-size: .8125rem; font-weight: 560;
+    padding: .4rem .85rem; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line-strong); background: var(--bg-raised); color: var(--fg-muted);
+  }
+  .tabs__bar button:hover { color: var(--accent); border-color: var(--accent); }
+  .tabs__bar button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  .foot-row { display: grid; gap: 1rem; }
+  @media (min-width: 900px) { .foot-row { grid-template-columns: 1fr 1fr; } }
+  .foot-row > * { min-width: 0; }
+
+  .drop-panel, .bench-panel {
+    background: var(--bg-raised); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); padding: 1.5rem;
+  }
+  .drop-panel h3, .bench-panel h3 { font-size: 1rem; margin-bottom: .4rem; }
+  .panel__lede { font-size: .8125rem; color: var(--fg-muted); margin-bottom: 1.25rem; }
+
+  .drop { list-style: none; margin: 0; padding: 0; display: grid; gap: .9rem; }
+  .drop__head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; font-size: .8125rem; margin-bottom: .35rem; }
+  .drop__what { display: inline-flex; align-items: center; gap: .35rem; flex-wrap: wrap; }
+  .drop__d { font-variant-numeric: tabular-nums; font-weight: 640; color: var(--c-s); }
+  .drop__bar { height: 6px; border-radius: 3px; background: var(--bg-sunken); overflow: hidden; }
+  .drop__bar span { display: block; height: 100%; background: var(--c-s); border-radius: 3px; }
+
+  .bench { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+  .bench__item {
+    display: grid; grid-template-columns: 3.2rem 1fr auto; align-items: baseline;
+    gap: .6rem; padding: .4rem 0; font-size: .8125rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .bench__item:last-child { border-bottom: 0; }
+  .bench__key {
+    font-family: var(--font-mono); font-size: .65rem; font-weight: 700;
+    color: var(--accent); background: var(--accent-soft);
+    border: 1px solid var(--accent-line); border-radius: 4px;
+    padding: .1rem .3rem; text-align: center;
+  }
+  .bench__name { min-width: 0; }
+  .bench__type { font-size: .7rem; color: var(--fg-faint); white-space: nowrap; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-tabs]").forEach((group) => {
+    const tabs = [...group.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = tabs.map((t) => document.getElementById(t.getAttribute("aria-controls")!)!);
+    const select = (i: number) => {
+      tabs.forEach((t, j) => {
+        t.setAttribute("aria-selected", String(i === j));
+        t.tabIndex = i === j ? 0 : -1;
+        panels[j].hidden = i !== j;
+      });
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", () => select(i));
+      t.addEventListener("keydown", (e) => {
+        const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        const n = (i + d + tabs.length) % tabs.length;
+        select(n); tabs[n].focus();
+      });
+    });
+    select(0);
+  });
+</script>

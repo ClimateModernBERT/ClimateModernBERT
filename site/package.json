@@ -1,0 +1,20 @@
+{
+  "name": "climatemodernbert-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Project website for ClimateModernBERT.",
+  "scripts": {
+    "dev": "npm run assets && astro dev",
+    "assets": "node scripts/copy-assets.mjs",
+    "prebuild": "npm run assets",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "npm run assets && astro check"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "astro": "^5.14.1",
+    "typescript": "^5.9.2"
+  }
+}
